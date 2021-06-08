@@ -1,0 +1,2 @@
+;;; Generated package description from nswbuff.el  -*- no-byte-compile: t -*-
+(define-package "nswbuff" "20210129.850" "Quick switching between buffers." '((emacs "25.1")) :commit "2aa3a96abbc76f007923f3fbb19a5246e29ae500" :authors '(("David Ponce" . "david@dponce.com") ("Kahlil (Kal) HODGSON" . "dorge@tpg.com.au") ("Joost Kremers" . "joostkremers@fastmail.fm")) :maintainer '("Joost Kremers" . "joostkremers@fastmail.fm") :keywords '("extensions" "convenience") :url "https://github.com/joostkremers/nswbuff")

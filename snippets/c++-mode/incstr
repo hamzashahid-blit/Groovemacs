@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: include-str
+# key: incstr
+# --
+#include <string>

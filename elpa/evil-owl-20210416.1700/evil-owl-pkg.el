@@ -1,0 +1,2 @@
+;;; Generated package description from evil-owl.el  -*- no-byte-compile: t -*-
+(define-package "evil-owl" "20210416.1700" "Preview evil registers and marks before using them" '((emacs "25.1") (evil "1.2.13")) :commit "a41a6d28e26052b25f3d21da37ccf1d8fde1e6aa" :authors '(("Daniel Phan" . "daniel.phan36@gmail.com")) :maintainer '("Daniel Phan" . "daniel.phan36@gmail.com") :keywords '("emulations" "evil" "visual") :url "https://github.com/mamapanda/evil-owl")

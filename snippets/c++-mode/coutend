@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# contributor: Hamza Shahid
+# name: cout-endl
+# key: coutend
+# --
+`(progn (goto-char (point-min)) (unless (re-search-forward
+"^using\\s-+namespace std;" nil 'no-errer) "std::"))
+`cout << $0 << `(progn (goto-char (point-min)) (unless (re-search-forward
+"^using\\s-+namespace std;" nil 'no-errer) "std::"))
+`endl;
