@@ -658,8 +658,9 @@
 (use-package evil-smartparens
   :after evil
   :config
-  (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)
-  (add-hook 'smartparens-global-mode-hook #'evil-smartparens-mode))
+  ;; (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)
+  ;; (add-hook 'smartparens-global-mode-hook #'evil-smartparens-mode))
+  )
 
 ;; surround anything with anything
 (use-package evil-surround
@@ -928,6 +929,22 @@
   :defer t)
 (use-package nim-mode
   :defer t)
+
+(defun em-gnu-apl-init ()
+  (setq buffer-face-mode-face 'gnu-apl-default)
+  (buffer-face-mode)
+  (set-input-method "APL-Z"))
+
+(use-package gnu-apl-mode
+  :defer t
+  :config
+  (add-hook 'gnu-apl-interactive-mode-hook 'em-gnu-apl-init)
+  (add-hook 'gnu-apl-mode-hook 'em-gnu-apl-init))
+
+(use-package j-mode
+  :defer t
+  :init
+  (setq j-console-cmd "jconsole"))
 
 ;; C++ START ;;
 
@@ -1307,9 +1324,9 @@ Argument X The image file path."
   ;;  ""
 
   (general-define-key
-   ;; :states '(normal visual insert emacs)
+   :states '(normal visual insert emacs)
    :keymaps 'override ;; override any existing keybindings
-   :prefix "C-SPC"
+   :prefix "SPC"
    :non-normal-prefix "C-SPC"
 
    ;;; General ;)
@@ -1544,9 +1561,9 @@ Argument X The image file path."
             (cons 360 "#7c6f64")))
        '(vc-annotate-very-old-color nil)))
  '(package-selected-packages
-    '(slime boon xah-fly-keys pcre2el which-key which-key-posframe js2-mode web-mode emmet-mode cmake-mode evil-mu4e vterm fold-this yafolding ivy-posframe evil-owl evil-org evil-matchit evil-nerd-commenter evil-goggles evil-exchange evil-lion good-scroll anzu evil-multiedit evil-mc multiple-cursors visual-regexp-steroids eterm-256color treemacs-icons-dired all-the-icons-dired dired-icons evil-surround org-drill ivy-prescient smart-tabs-mode highlight-indent-guides flx-counsel flx hindent dap-haskell dap-mode lsp-treemacs lsp-ivy lsp-ui lsp-haskell yasnippet-snippets use-package undo-tree try sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-roam org-noter org-download olivetti magit lua-mode ivy-rich iedit hydra helpful helm-dash haskell-mode general evil-smartparens evil-collection eimp doom-themes doom-modeline counsel concurrent command-log-mode cl-libify auto-complete auctex-latexmk))
+    '(j-mode gnu-apl-mode slime boon xah-fly-keys pcre2el which-key which-key-posframe js2-mode web-mode emmet-mode cmake-mode evil-mu4e vterm fold-this yafolding ivy-posframe evil-owl evil-org evil-matchit evil-nerd-commenter evil-goggles evil-exchange evil-lion good-scroll anzu evil-multiedit evil-mc multiple-cursors visual-regexp-steroids eterm-256color treemacs-icons-dired all-the-icons-dired dired-icons evil-surround org-drill ivy-prescient smart-tabs-mode highlight-indent-guides flx-counsel flx hindent dap-haskell dap-mode lsp-treemacs lsp-ivy lsp-ui lsp-haskell yasnippet-snippets use-package undo-tree try sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-roam org-noter org-download olivetti magit lua-mode ivy-rich iedit hydra helpful helm-dash haskell-mode general evil-smartparens evil-collection eimp doom-themes doom-modeline counsel concurrent command-log-mode cl-libify auto-complete auctex-latexmk))
  '(tab-stop-list '(4))
- '(whitespace-style '(face trailing)))
+ '(whitespace-style '(face trailing) t))
 
 (put 'narrow-to-region 'disabled nil)
 
@@ -1572,6 +1589,7 @@ Argument X The image file path."
  '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
  '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
  '(evil-goggles-yank-face ((t (:inherit diff-changed))))
+ '(gnu-apl-default ((t (:weight semi-bold :family "FreeMono"))) t)
  '(mode-line ((t (:background "#504945" :foreground "#dfd2b8" :box nil :width normal :family "Mononoki"))))
  '(org-ellipsis ((t (:foreground "#504945" :underline nil))))
  '(org-superstar-leading ((t (:inherit default :foreground "#282828"))))
