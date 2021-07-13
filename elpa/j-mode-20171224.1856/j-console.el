@@ -46,7 +46,11 @@
   :group 'j
   :prefix "j-console-")
 
+<<<<<<< HEAD
 (defcustom j-console-cmd "jconsole"
+=======
+(defcustom j-console-cmd "ijconsole"
+>>>>>>> origin/master
   "Name of the executable used for the J REPL session"
   :type 'string
   :group 'j-console)
