@@ -79,7 +79,7 @@
 
 ;; *** Initialize package sources ***
 
-(add-to-list 'load-path "~/.emacs.d")
+;;(add-to-list 'load-path "~/.emacs.d/")
 
 (require 'package)                   ; Bring in to the environment all package management functions
 
@@ -358,8 +358,8 @@
 ;;          ("M-<iso-lefttab>" . iflipb-previous-buffer)))
 
 (use-package nswbuff
-  :bind (("M-<tab>" . nswbuff-switch-to-next-buffer)
-         ("M-<iso-lefttab>" . nswbuff-switch-to-previous-buffer)))
+  :bind (("C-<tab>" . nswbuff-switch-to-next-buffer)
+         ("C-<iso-lefttab>" . nswbuff-switch-to-previous-buffer)))
 
 ;; (use-package buffer-flip
 ;;   :bind  (("M-<tab>" . buffer-flip)
@@ -469,6 +469,21 @@
   ([remap describe-key] . helpful-key))
 
 
+(use-package centaur-tabs
+  :bind (:map evil-normal-state-map
+          ("g t" . centaur-tabs-forward)
+	      ("g T" . centaur-tabs-backward))
+  :config
+  (setq centaur-tabs-style 'box
+        centaur-tabs-set-bar 'over        ;; Set a bar 'over 'under 'left ... of the tab denoting which tab we are on
+        x-underline-at-descent-line t      ;; If not using spacemacs this will display bar correctly
+        centaur-tabs-set-icons t           ;; show icons in tabs
+        centaur-gray-out-icons nil         ;; if set to 'buffer gray out icons of any buffer tab like *scrath* or dired
+        centaur-tabs-height 24             ;; set tab height
+        centaur-tabs-set-modified-marker t ;; we want to change the "x" icon on the tab when buffer is unsaved
+        centaur-tabs-modified-marker "●")  ;; set the marker for above change
+  (centaur-tabs-mode t))
+
 ;; jump around very conveniently
 (use-package avy)
 
@@ -476,113 +491,113 @@
 ;;   :init
 ;;   (xah-fly-keys-set-layout "qwerty"))
 
-(use-package boon
-  :config
-  (require 'boon-qwerty))
+;; (use-package boon
+;;   :config
+;;   (require 'boon-qwerty))
 
-(defun meow-setup ()
-  (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-  (meow-motion-overwrite-define-key
-   '("j" . meow-next)
-   '("k" . meow-prev))
-  (meow-leader-define-key
-   ;; SPC j/k will run the original command in MOTION state.
-   '("j" . meow-motion-origin-command)
-   '("k" . meow-motion-origin-command)
-   ;; Use SPC (0-9) for digit arguments.
-   '("1" . meow-digit-argument)
-   '("2" . meow-digit-argument)
-   '("3" . meow-digit-argument)
-   '("4" . meow-digit-argument)
-   '("5" . meow-digit-argument)
-   '("6" . meow-digit-argument)
-   '("7" . meow-digit-argument)
-   '("8" . meow-digit-argument)
-   '("9" . meow-digit-argument)
-   '("0" . meow-digit-argument)
-   '("/" . meow-keypad-describe-key)
-   '("?" . meow-cheatsheet))
-  (meow-normal-define-key
-   '("0" . meow-expand-0)
-   '("9" . meow-expand-9)
-   '("8" . meow-expand-8)
-   '("7" . meow-expand-7)
-   '("6" . meow-expand-6)
-   '("5" . meow-expand-5)
-   '("4" . meow-expand-4)
-   '("3" . meow-expand-3)
-   '("2" . meow-expand-2)
-   '("1" . meow-expand-1)
-   '("-" . negative-argument)
-   '(";" . meow-reverse)
-   '("," . meow-inner-of-thing)
-   '("." . meow-bounds-of-thing)
-   '("[" . meow-beginning-of-thing)
-   '("]" . meow-end-of-thing)
-   '("a" . meow-append)
-   '("A" . meow-open-below)
-   '("b" . meow-back-word)
-   '("B" . meow-back-symbol)
-   '("c" . meow-change)
-   '("C" . meow-change-save)
-   '("d" . meow-C-d)
-   '("D" . meow-backward-delete)
-   '("e" . meow-next-word)
-   '("E" . meow-next-symbol)
-   '("f" . meow-find)
-   '("F" . meow-find-expand)
-   '("g" . meow-cancel)
-   '("G" . meow-grab)
-   '("h" . meow-left)
-   '("H" . meow-left-expand)
-   '("i" . meow-insert)
-   '("I" . meow-open-above)
-   '("j" . meow-next)
-   '("J" . meow-next-expand)
-   '("k" . meow-prev)
-   '("K" . meow-prev-expand)
-   '("l" . meow-right)
-   '("L" . meow-right-expand)
-   '("m" . meow-join)
-   '("n" . meow-search)
-   '("N" . meow-pop-search)
-   '("o" . meow-block)
-   '("O" . meow-block-expand)
-   '("p" . meow-yank)
-   '("P" . meow-yank-pop)
-   '("q" . meow-quit)
-   '("Q" . meow-goto-line)
-   '("r" . meow-replace)
-   '("R" . meow-swap-grab)
-   '("s" . meow-kill)
-   '("t" . meow-till)
-   '("T" . meow-till-expand)
-   '("u" . meow-undo)
-   '("U" . meow-undo-in-selection)
-   '("v" . meow-visit)
-   '("V" . meow-kmacro-matches)
-   '("w" . meow-mark-word)
-   '("W" . meow-mark-symbol)
-   '("x" . meow-line)
-   '("X" . meow-kmacro-lines)
-   '("y" . meow-save)
-   '("Y" . meow-sync-grab)
-   '("z" . meow-pop-selection)
-   '("Z" . meow-pop-all-selection)
-   '("&" . meow-query-replace)
-   '("%" . meow-query-replace-regexp)
-   '("'" . repeat)
-   '("\\" . quoted-insert)
-   '("<escape>" . meow-last-buffer)))
+;; (defun meow-setup ()
+;;   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+;;   (meow-motion-overwrite-define-key
+;;    '("j" . meow-next)
+;;    '("k" . meow-prev))
+;;   (meow-leader-define-key
+;;    ;; SPC j/k will run the original command in MOTION state.
+;;    '("j" . meow-motion-origin-command)
+;;    '("k" . meow-motion-origin-command)
+;;    ;; Use SPC (0-9) for digit arguments.
+;;    '("1" . meow-digit-argument)
+;;    '("2" . meow-digit-argument)
+;;    '("3" . meow-digit-argument)
+;;    '("4" . meow-digit-argument)
+;;    '("5" . meow-digit-argument)
+;;    '("6" . meow-digit-argument)
+;;    '("7" . meow-digit-argument)
+;;    '("8" . meow-digit-argument)
+;;    '("9" . meow-digit-argument)
+;;    '("0" . meow-digit-argument)
+;;    '("/" . meow-keypad-describe-key)
+;;    '("?" . meow-cheatsheet))
+;;   (meow-normal-define-key
+;;    '("0" . meow-expand-0)
+;;    '("9" . meow-expand-9)
+;;    '("8" . meow-expand-8)
+;;    '("7" . meow-expand-7)
+;;    '("6" . meow-expand-6)
+;;    '("5" . meow-expand-5)
+;;    '("4" . meow-expand-4)
+;;    '("3" . meow-expand-3)
+;;    '("2" . meow-expand-2)
+;;    '("1" . meow-expand-1)
+;;    '("-" . negative-argument)
+;;    '(";" . meow-reverse)
+;;    '("," . meow-inner-of-thing)
+;;    '("." . meow-bounds-of-thing)
+;;    '("[" . meow-beginning-of-thing)
+;;    '("]" . meow-end-of-thing)
+;;    '("a" . meow-append)
+;;    '("A" . meow-open-below)
+;;    '("b" . meow-back-word)
+;;    '("B" . meow-back-symbol)
+;;    '("c" . meow-change)
+;;    '("C" . meow-change-save)
+;;    '("d" . meow-C-d)
+;;    '("D" . meow-backward-delete)
+;;    '("e" . meow-next-word)
+;;    '("E" . meow-next-symbol)
+;;    '("f" . meow-find)
+;;    '("F" . meow-find-expand)
+;;    '("g" . meow-cancel)
+;;    '("G" . meow-grab)
+;;    '("h" . meow-left)
+;;    '("H" . meow-left-expand)
+;;    '("i" . meow-insert)
+;;    '("I" . meow-open-above)
+;;    '("j" . meow-next)
+;;    '("J" . meow-next-expand)
+;;    '("k" . meow-prev)
+;;    '("K" . meow-prev-expand)
+;;    '("l" . meow-right)
+;;    '("L" . meow-right-expand)
+;;    '("m" . meow-join)
+;;    '("n" . meow-search)
+;;    '("N" . meow-pop-search)
+;;    '("o" . meow-block)
+;;    '("O" . meow-block-expand)
+;;    '("p" . meow-yank)
+;;    '("P" . meow-yank-pop)
+;;    '("q" . meow-quit)
+;;    '("Q" . meow-goto-line)
+;;    '("r" . meow-replace)
+;;    '("R" . meow-swap-grab)
+;;    '("s" . meow-kill)
+;;    '("t" . meow-till)
+;;    '("T" . meow-till-expand)
+;;    '("u" . meow-undo)
+;;    '("U" . meow-undo-in-selection)
+;;    '("v" . meow-visit)
+;;    '("V" . meow-kmacro-matches)
+;;    '("w" . meow-mark-word)
+;;    '("W" . meow-mark-symbol)
+;;    '("x" . meow-line)
+;;    '("X" . meow-kmacro-lines)
+;;    '("y" . meow-save)
+;;    '("Y" . meow-sync-grab)
+;;    '("z" . meow-pop-selection)
+;;    '("Z" . meow-pop-all-selection)
+;;    '("&" . meow-query-replace)
+;;    '("%" . meow-query-replace-regexp)
+;;    '("'" . repeat)
+;;    '("\\" . quoted-insert)
+;;    '("<escape>" . meow-last-buffer)))
 
-(use-package meow
-  :demand t
-  :init
-  (meow-global-mode 0)
-  :config
-  (meow-setup)
-  (meow-setup-line-number)
-  (meow-setup-indicator))
+;; (use-package meow
+;;   :demand t
+;;   :init
+;;   (meow-global-mode 0)
+;;   :config
+;;   (meow-setup)
+;;   (meow-setup-line-number)
+;;   (meow-setup-indicator))
 
 ;;;;;;;;;;;;;;;;;
 ;;; EVIL MODE ;;;
@@ -760,7 +775,55 @@
 
 ;; be in a state like when you press C-x C-+ and then just press +, - or 0
 (use-package hydra
-  :defer t)
+  :defer 2
+  :bind ("C-c c" . hydra-clock/body)
+        ("C-c z" . hydra-zoom/body)
+        ("C-c r" . 'hydra-launcher/body))
+
+(defhydra hydra-zoom ()
+  "zoom"
+  ("k" text-scale-increase "in")
+  ("l" text-scale-decrease "out"))
+
+(defhydra hydra-launcher (:color blue)
+   "Launch"
+   ("h" woman "woman")
+   ("r" (browse-url "http://www.reddit.com/r/emacs/") "reddit")
+   ("w" (browse-url "http://www.emacswiki.org/") "emacswiki")
+   ("s" shell "shell")
+   ("q" nil "cancel"))
+
+(defun hydra-move-splitter-left (arg)
+  "Move window splitter left."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'right))
+      (shrink-window-horizontally arg)
+    (enlarge-window-horizontally arg)))
+
+(defhydra hydra-clock (:color blue)
+    "
+    ^
+    ^Clock^             ^Do^
+    ^─────^─────────────^──^─────────
+    _q_ quit            _c_ cancel
+    ^^                  _d_ display
+    ^^                  _e_ effort
+    ^^                  _i_ in
+    ^^                  _j_ jump
+    ^^                  _o_ out
+    ^^                  _r_ report
+    ^^                  ^^
+    "
+    ("q" nil)
+    ("c" org-clock-cancel :color pink)
+    ("d" org-clock-display)
+    ("e" org-clock-modify-effort-estimate)
+    ("i" org-clock-in)
+    ("j" org-clock-goto)
+    ("o" org-clock-out)
+    ("r" org-clock-report))
+
 
 ;;; Terminal Start ;;;
 
@@ -805,16 +868,62 @@
 (add-to-list 'exec-path "/home/hamza/.src/context-linux/tex/texmf-linux/bin")
 
 (use-package pdf-tools
-  :defer t)
-
-(use-package auctex
-  :defer t
-  :ensure auctex
   :config
-  (setq TeX-PDF-mode t))
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-page)
+  (setq pdf-annot-activate-created-annotations t)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward)
+  (add-hook 'pdf-view-mode-hook (lambda ()
+				                  (bms/pdf-midnite-amber)))) ; automatically turns on midnight-mode for pdfs
+
+;; (use-package auctex
+;;   :defer t
+;;   :ensure auctex
+;;   :config
+;;   (setq TeX-PDF-mode t))
 
 (use-package auctex-latexmk
-  :defer t)
+  :config
+  (auctex-latexmk-setup)
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t))
+
+(use-package reftex
+  :defer t
+  :config
+  (setq reftex-site-prompt-optional-args t)) ;; Prompt for empty optional arguments in cite
+
+(use-package auto-dictionary
+  :init
+  (add-hook 'flyspell-mode-hook (lambda ()
+                                  (auto-dictionary-mode 1))))
+
+(use-package company-auctex
+  :init (company-auctex-init))
+
+(use-package tex
+  :ensure auctex
+  :mode ("\\.tex\\'" . latex-mode)
+  :config
+  (setq TeX-source-correlate-mode t                            ;; Forward and inverse search
+        TeX-source-correlate-method 'synctex                   ;; Search forward and backward with synctex method
+        TeX-auto-save t                                        ;; Auto save file if not saved within certain time 
+        TeX-parse-self t)                                      ;; Parse file after loading it if no style hook is found for it. 
+  (setq-default TeX-master "paper.tex")                        ;; Master file associated with the current buffer
+  (setq reftex-plug-into-AUCTeX t)                             ;; Use reftex with auctex 
+  (pdf-tools-install)                                          ;; Make sure pdf-tools is setup
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools")) ;; Output through pdf-tools
+        TeX-source-correlate-start-server t)                   ;; Start the search server with tex
+
+  ;; Update PDF buffers after successful LaTeX runs
+  (add-hook 'TeX-after-compilation-finished-functions
+            #'TeX-revert-document-buffer)
+
+  ;; Turn on reftex and flyspell modes
+  (add-hook 'LaTeX-mode-hook
+      (lambda ()
+        (reftex-mode t)
+        (flyspell-mode t))))
 
 ;;; TeX End ;;;
 
@@ -916,10 +1025,6 @@
 
 ;; Haskell END ;;
 
-(use-package slime
-  :config
-  (setq inferior-lisp-program "ccl"))
-
 (use-package cmake-mode
   :defer t)
 (use-package lua-mode
@@ -928,8 +1033,29 @@
   :defer t)
 (use-package nim-mode
   :defer t)
+(use-package j-mode
+  :defer t)
+
+(use-package slime
+  :config
+  ;; (setq inferior-lisp-program "ccl")
+  (setq inferior-lisp-program "sbcl"))
+
+(use-package paredit
+  :defer t
+  :config
+  (add-hook 'lisp-mode 'paredit-mode)
+  (add-hook 'emacs-lisp-mode 'paredit-mode))
+
+(use-package evil-paredit
+  :defer t
+  :config
+  (add-hook 'lisp-mode 'evil-paredit-mode)
+  (add-hook 'emacs-lisp-mode 'evil-paredit-mode))
+
 
 ;; C++ START ;;
+
 
 ;;; DOESN'T WORK AUTOMATICALLY or does it?
 
@@ -1109,6 +1235,11 @@
 (use-package all-the-icons-dired
   :config
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+
+(use-package treemacs
+  :config
+  (treemacs-resize-icons 24))
+
 ;(use-package treemacs-icons-dired
   ;:after treemacs dired
   ;:config
@@ -1117,16 +1248,13 @@
 
 ;(setq dired-listting-switches )
 
-;;; DIRED end ;;;
+;;; DIRED end ;;
 
 ;; Babel Start
 
 (org-babel-do-load-languages 'org-babel-load-languages
-  '(
-    (shell . t)
-	(latex . t)
-  )
-)
+  '((shell . t)
+	(latex . t)))
 
 ;; Babel End
 
@@ -1307,9 +1435,9 @@ Argument X The image file path."
   ;;  ""
 
   (general-define-key
-   ;; :states '(normal visual insert emacs)
+   :states '(normal visual insert emacs)
    :keymaps 'override ;; override any existing keybindings
-   :prefix "C-SPC"
+   :prefix "SPC"
    :non-normal-prefix "C-SPC"
 
    ;;; General ;)
@@ -1376,10 +1504,12 @@ Argument X The image file path."
 
    ;;; Toggle
    "t" '(:ignore t :which-key "Toggle")
+   "tt" '(treemacs :which-key "Treemacs")
+   "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
    "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
    "tg" '(evil-goggles-mode :which-key "Evil Goggles")
    "ts" '(:ignore t :which-key "Smartparens")
-   "tst" '(smartparens-mode :which-key "Toggle Smartparens Mode")
+   "tst" '(smartparens-mode :which-key "Smartparens Mode")
    "tss" '(smartparens-strict-mode :which-key "Strict Mode")
 
    ;;; Org Mode
@@ -1544,7 +1674,7 @@ Argument X The image file path."
             (cons 360 "#7c6f64")))
        '(vc-annotate-very-old-color nil)))
  '(package-selected-packages
-    '(slime boon xah-fly-keys pcre2el which-key which-key-posframe js2-mode web-mode emmet-mode cmake-mode evil-mu4e vterm fold-this yafolding ivy-posframe evil-owl evil-org evil-matchit evil-nerd-commenter evil-goggles evil-exchange evil-lion good-scroll anzu evil-multiedit evil-mc multiple-cursors visual-regexp-steroids eterm-256color treemacs-icons-dired all-the-icons-dired dired-icons evil-surround org-drill ivy-prescient smart-tabs-mode highlight-indent-guides flx-counsel flx hindent dap-haskell dap-mode lsp-treemacs lsp-ivy lsp-ui lsp-haskell yasnippet-snippets use-package undo-tree try sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-roam org-noter org-download olivetti magit lua-mode ivy-rich iedit hydra helpful helm-dash haskell-mode general evil-smartparens evil-collection eimp doom-themes doom-modeline counsel concurrent command-log-mode cl-libify auto-complete auctex-latexmk))
+    '(tex auto-dictionary centaur-tabs company-auctex j-mode evil-paredit paredit slime boon xah-fly-keys pcre2el which-key which-key-posframe js2-mode web-mode emmet-mode cmake-mode evil-mu4e vterm fold-this yafolding ivy-posframe evil-owl evil-org evil-matchit evil-nerd-commenter evil-goggles evil-exchange evil-lion good-scroll anzu evil-multiedit evil-mc multiple-cursors visual-regexp-steroids eterm-256color treemacs-icons-dired all-the-icons-dired dired-icons evil-surround org-drill ivy-prescient smart-tabs-mode highlight-indent-guides flx-counsel flx hindent dap-haskell dap-mode lsp-treemacs lsp-ivy lsp-ui lsp-haskell yasnippet-snippets use-package undo-tree try sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-roam org-noter org-download olivetti magit lua-mode ivy-rich iedit hydra helpful helm-dash haskell-mode general evil-smartparens evil-collection eimp doom-themes doom-modeline counsel concurrent command-log-mode cl-libify auto-complete auctex-latexmk))
  '(tab-stop-list '(4))
  '(whitespace-style '(face trailing)))
 
@@ -1584,3 +1714,5 @@ Argument X The image file path."
 ;; (provide 'init)
 
 ;; ;;; init.el ends here
+
+Emacs-Lisp finished at Tue Jul 13 13:34:17
