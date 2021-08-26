@@ -1691,11 +1691,7 @@ Argument X The image file path."
             (cons 360 "#7c6f64")))
        '(vc-annotate-very-old-color nil)))
  '(package-selected-packages
-<<<<<<< HEAD
     '(tex auto-dictionary centaur-tabs company-auctex j-mode evil-paredit paredit slime boon xah-fly-keys pcre2el which-key which-key-posframe js2-mode web-mode emmet-mode cmake-mode evil-mu4e vterm fold-this yafolding ivy-posframe evil-owl evil-org evil-matchit evil-nerd-commenter evil-goggles evil-exchange evil-lion good-scroll anzu evil-multiedit evil-mc multiple-cursors visual-regexp-steroids eterm-256color treemacs-icons-dired all-the-icons-dired dired-icons evil-surround org-drill ivy-prescient smart-tabs-mode highlight-indent-guides flx-counsel flx hindent dap-haskell dap-mode lsp-treemacs lsp-ivy lsp-ui lsp-haskell yasnippet-snippets use-package undo-tree try sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-roam org-noter org-download olivetti magit lua-mode ivy-rich iedit hydra helpful helm-dash haskell-mode general evil-smartparens evil-collection eimp doom-themes doom-modeline counsel concurrent command-log-mode cl-libify auto-complete auctex-latexmk))
-=======
-    '(j-mode gnu-apl-mode slime boon xah-fly-keys pcre2el which-key which-key-posframe js2-mode web-mode emmet-mode cmake-mode evil-mu4e vterm fold-this yafolding ivy-posframe evil-owl evil-org evil-matchit evil-nerd-commenter evil-goggles evil-exchange evil-lion good-scroll anzu evil-multiedit evil-mc multiple-cursors visual-regexp-steroids eterm-256color treemacs-icons-dired all-the-icons-dired dired-icons evil-surround org-drill ivy-prescient smart-tabs-mode highlight-indent-guides flx-counsel flx hindent dap-haskell dap-mode lsp-treemacs lsp-ivy lsp-ui lsp-haskell yasnippet-snippets use-package undo-tree try sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-roam org-noter org-download olivetti magit lua-mode ivy-rich iedit hydra helpful helm-dash haskell-mode general evil-smartparens evil-collection eimp doom-themes doom-modeline counsel concurrent command-log-mode cl-libify auto-complete auctex-latexmk))
->>>>>>> origin/master
  '(tab-stop-list '(4))
  '(whitespace-style '(face trailing) t))
 
