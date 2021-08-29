@@ -609,6 +609,7 @@
   :init
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil) ; Adds more vim bindings to other parts of emacs. I use evil-collection instead
+  (setq evil-want-minibuffer t) ; Enables evil in the minibuffer
   (setq evil-want-C-u-scroll t) ; Use C-u as go up instead of universal argument
   (setq evil-want-C-i-jump nil)
   (setq evil-want-Y-yank-to-eol t) ; Make Shift-Y yank to end of line instead of yanking whole line
