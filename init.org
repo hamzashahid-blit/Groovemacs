@@ -1,5 +1,6 @@
 #+TITLE: Groovemacs Org Config File
 #+AUTHOR: Hamza Shahid
+#+STARTUP: overview
 #+PROPERTY: header-args:emacs-lisp :tangle ./org-init.el
 
 * TODO Create install script
@@ -43,12 +44,35 @@
 
 * Font
   #+begin_src emacs-lisp
-	;; Set font and font size
+	;; TODO: Which-key gets covered up with minibuffer if font size is 13 or above
+
+	;; (defun my-frame-tweaks (&optional frame)
+	;;   "My personal frame tweaks."
+	;;   (interactive)
+	;;   (unless frame
+	;; 	(setq frame (selected-frame)))
+	;;   (when frame
+	;; 	(with-selected-frame frame
+	;; 	(when (display-graphic-p)
+	;;   (set-face-attribute 'default nil :font "Mononoki" :height 120)
+	;;   (let ((faces '(mode-line
+	;; 		  mode-line-buffer-id
+	;; 		  mode-line-emphasis
+	;; 		  mode-line-highlight
+	;; 		  mode-line-inactive)))
+	;; 	  (mapc
+	;; 	  (lambda (face) (set-face-attribute face nil
+	;; 						:font "Mononoki-12")) faces))))))
 
 	;; Default font size
-	(set-face-attribute 'default nil :font "Mononoki" :height 150) ;; :height 118
+	;(set-face-attribute 'default nil :font "Mononoki" :height 125) ;; :height 118
+
+	;(my-frame-tweaks)
+	;(add-hook 'after-make-frame-functions #'my-frame-tweaks t)
 
 
+	(add-to-list 'default-frame-alist '(font . "Mononoki-13"))
+	(set-face-attribute 'default t :font "Mononoki-13")
 
 	;;; Default to utf-8 encoding
 	(set-default-coding-systems 'utf-8)
@@ -60,14 +84,14 @@
 	(prefer-coding-system 'utf-8)
 	(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 
-	(let ((faces '(mode-line
-				  mode-line-buffer-id
-				  mode-line-emphasis
-				  mode-line-highlight
-				  mode-line-inactive)))
-		(mapc
-		 (lambda (face) (set-face-attribute face nil :font "Monospace-10"))
-		 faces))
+	;; (let ((faces '(mode-line
+	;; 			  mode-line-buffer-id
+	;; 			  mode-line-emphasis
+	;; 			  mode-line-highlight
+	;; 			  mode-line-inactive)))
+	;; 	(mapc
+	;; 	 (lambda (face) (set-face-attribute face nil :font "Monospace-10"))
+	;; 	 faces))
   #+end_src
 
 * Initialize Packages
@@ -271,20 +295,21 @@
 
 * Centaur Tabs
   #+begin_src emacs-lisp
-    (use-package centaur-tabs
-      :bind (:map evil-normal-state-map
-	      ("g t" . centaur-tabs-forward)
+	(use-package centaur-tabs
+	  :bind (:map evil-normal-state-map
+		  ("g t" . centaur-tabs-forward)
 		  ("g T" . centaur-tabs-backward))
-      :config
-      (setq centaur-tabs-style 'box
-	    centaur-tabs-set-bar 'over        ;; Set a bar 'over 'under 'left ... of the tab denoting which tab we are on
-	    x-underline-at-descent-line t      ;; If not using spacemacs this will display bar correctly
-	    centaur-tabs-set-icons t           ;; show icons in tabs
-	    centaur-gray-out-icons nil         ;; if set to 'buffer gray out icons of any buffer tab like *scrath* or dired
-	    centaur-tabs-height 24             ;; set tab height
-	    centaur-tabs-set-modified-marker t ;; we want to change the "x" icon on the tab when buffer is unsaved
-	    centaur-tabs-modified-marker "●")  ;; set the marker for above change
-      (centaur-tabs-mode t))
+	  :config
+	  (setq centaur-tabs-style 'box
+		centaur-tabs-set-bar 'over        ;; Set a bar 'over 'under 'left ... of the tab denoting which tab we are on
+		x-underline-at-descent-line t      ;; If not using spacemacs this will display bar correctly
+		centaur-tabs-set-icons t           ;; show icons in tabs
+		centaur-gray-out-icons nil         ;; if set to 'buffer gray out icons of any buffer tab like *scrath* or dired
+		centaur-tabs-height 24             ;; set tab height
+		centaur-tabs-set-modified-marker t ;; we want to change the "x" icon on the tab when buffer is unsaved
+		centaur-tabs-modified-marker "●")  ;; set the marker for above change
+      :after
+	  (centaur-tabs-mode t))
   #+end_src
 
 * Helm
@@ -442,7 +467,7 @@
 	  (setq org-agenda-files
 			'("~/wrk/tasks.org"))
 
-	  (add-hook 'org-mode-hook 'turn-on-flyspell)
+	  ;(add-hook 'org-mode-hook 'turn-on-flyspell)
 	  (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
 	  (setq org-agenda-start-with-log-mode t) ;; present a log
@@ -452,52 +477,53 @@
 
 ** Rest Of the stuff
    #+begin_src emacs-lisp
-     ;; 'org-store-link allows to create a link to any header in any org mode file.
-     ;; and if you run 'org-insert-link right after that, you can insert a link to goto that heading
-     ;; for now, to go to the link you have to click the link
-     ;(global-set-key (kbd "C-c l") 'org-store-link)
-     ;(global-set-key (kbd "C-c C-l") 'org-insert-link)
+	 ;; 'org-store-link allows to create a link to any header in any org mode file.
+	 ;; and if you run 'org-insert-link right after that, you can insert a link to goto that heading
+	 ;; for now, to go to the link you have to click the link
+	 ;(global-set-key (kbd "C-c l") 'org-store-link)
+	 ;(global-set-key (kbd "C-c C-l") 'org-insert-link)
 
-     ;; (use-package org-bullets
-     ;;   :config
-     ;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+	 (use-package org-bullets
+	   :hook (org-mode . org-bullets-mode))
+	   ;; :config
+	   ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-     ;(use-package org-superstar
-     ;  :hook (org-mode . org-superstar-mode))
-     ;  ;; :config
-     ;  ;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
+	 (use-package org-superstar
+	   :hook (org-mode . org-superstar-mode))
+	   ;; :config
+	   ;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
 
-     (setq org-image-actual-width nil)
-     (setq org-hide-emphasis-markers t)
-     (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+	 (setq org-image-actual-width nil)
+	 (setq org-hide-emphasis-markers t)
+	 (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
-     (use-package olivetti
-       :hook (org-mode . olivetti-mode)
-       :init
-       (setq olivetti-body-width 90)
-       (setq fill-column 80))
+	 (use-package olivetti
+	   :hook (org-mode . olivetti-mode)
+	   :init
+	   (setq olivetti-body-width 90)
+	   (setq fill-column 80))
 
-     ;; (use-package org-drill
-     ;;   :hook (org-mode . org-drill))
+	 ;; (use-package org-drill
+	 ;;   :hook (org-mode . org-drill))
 
-     ;; (use-package org-noter
-     ;;   :defer t
-     ;;   :config
-     ;;   (setq org-noter-default-notes-file-names '("notes.org")) ; Main File
-     ;;   (setq org-noter-notes-search-path '("~/org/research-notes/notes")) ; Main Directory
-     ;;   (setq org-noter-separate-notes-from-heading t)) ; keep an empty line between headings and content
+	 ;; (use-package org-noter
+	 ;;   :defer t
+	 ;;   :config
+	 ;;   (setq org-noter-default-notes-file-names '("notes.org")) ; Main File
+	 ;;   (setq org-noter-notes-search-path '("~/org/research-notes/notes")) ; Main Directory
+	 ;;   (setq org-noter-separate-notes-from-heading t)) ; keep an empty line between headings and content
 
-     ;; (use-package org-roam
-     ;;   :defer t
-     ;;   :hook
-     ;;   (after-init . org-roam-mode)
-     ;;   :custom
-     ;;   (org-roam-directory "~/org/org-roam"))
+	 ;; (use-package org-roam
+	 ;;   :defer t
+	 ;;   :hook
+	 ;;   (after-init . org-roam-mode)
+	 ;;   :custom
+	 ;;   (org-roam-directory "~/org/org-roam"))
 
-     (use-package org-download)
+	 (use-package org-download)
 
-     ;; Drag-and-drop to `dired`
-     (add-hook 'dired-mode-hook 'org-download-enable)
+	 ;; Drag-and-drop to `dired`
+	 (add-hook 'dired-mode-hook 'org-download-enable)
    #+end_src
 
 ** Dired
@@ -1365,154 +1391,161 @@
 
 * Custom Functions
   #+begin_src emacs-lisp
-    (defun hamza/insert-line-below ()
-      "Insert an empty line below the current line."
-      (interactive)
-      (save-excursion
+	(defun hamza/insert-line-below ()
+	  "Insert an empty line below the current line."
+	  (interactive)
+	  (save-excursion
 	(end-of-line)
 	(open-line 1)))
 
-    (defun hamza/insert-line-above ()
-      "insert an empty line above the current line."
-      (interactive)
-      (save-excursion
+	(defun hamza/insert-line-above ()
+	  "insert an empty line above the current line."
+	  (interactive)
+	  (save-excursion
 	(end-of-line 0)
 	(open-line 1)))
 
-    (defun hamza/remove-line-below ()
-      "Remove the line below the current line."
-      (interactive)
-      (save-excursion
+	(defun hamza/remove-line-below ()
+	  "Remove the line below the current line."
+	  (interactive)
+	  (save-excursion
 	(next-line)
 	(kill-whole-line)))
 
-    (defun hamza/remove-line-above ()
-      "Remove the line above the current line."
-      (interactive)
-      (save-excursion
+	(defun hamza/remove-line-above ()
+	  "Remove the line above the current line."
+	  (interactive)
+	  (save-excursion
 	(previous-line)
 	(kill-whole-line)))
 
-    (defun hamza/insert-and-goto-line-below ()
-      "Insert a line below the current line and move to it"
-      (interactive)
-      (save-excursion
+	(defun hamza/insert-and-goto-line-below ()
+	  "Insert a line below the current line and move to it"
+	  (interactive)
+	  (save-excursion
 	(end-of-line)
 	(open-line 1)))
 
-    (defun hamza/insert-and-goto-line-above ()
-      "Insert a line above the current line and move to it"
-      (interactive)
-      (save-excursion
+	(defun hamza/insert-and-goto-line-above ()
+	  "Insert a line above the current line and move to it"
+	  (interactive)
+	  (save-excursion
 	(end-of-line)
 	(open-line 1)))
 
-    (defun hamza/download-url (url path)
-      "Downloads a file from a URL.
-    Argument PATH Where to save on your computer."
-      (interactive "MPlease Enter URL: \nFPlease Enter the File to Save to: ")
-      (url-copy-file url path))
+	(defun hamza/download-url (url path)
+	  "Downloads a file from a URL.
+	Argument PATH Where to save on your computer."
+	  (interactive "MPlease Enter URL: \nFPlease Enter the File to Save to: ")
+	  (url-copy-file url path))
 
-    ;; Open Image in another program
-    (defun hamza/open-image-externally (x)
-      "Takes an image and opens in GIMP or any other external program.
-    Argument X The image file path."
-      (interactive "FPlease Enter an Image: ")
-      ;;(start-process "" nil "xfce4-terminal"))
-      (shell-command (concat "gimp " x)))
+	;; Open Image in another program
+	(defun hamza/open-image-externally (x)
+	  "Takes an image and opens in GIMP or any other external program.
+	Argument X The image file path."
+	  (interactive "FPlease Enter an Image: ")
+	  ;;(start-process "" nil "xfce4-terminal"))
+	  (shell-command (concat "gimp " x)))
 
-    ;; Helper for compilation. Close the compilation window if
-    ;; there was no error at all. (emacs wiki)
-    (defun hamza/compilation-exit-autoclose (status code msg)
-      "If <M-x> compile exists with a 0 then bury the *compilation* buffer, so that C-x b doesn't go there and delete the *compilation* window."
-      (when (and (eq status 'exit) (zerop code))
+	;; Helper for compilation. Close the compilation window if
+	;; there was no error at all. (emacs wiki)
+	(defun hamza/compilation-exit-autoclose (status code msg)
+	  "If <M-x> compile exists with a 0 then bury the *compilation* buffer, so that C-x b doesn't go there and delete the *compilation* window."
+	  (when (and (eq status 'exit) (zerop code))
 	(bury-buffer)
 	(delete-window (get-buffer-window (get-buffer "*compilation*"))))
-      ;; Always return the anticipated result of compilation-exit-message-function
-      (cons msg code))
+	  ;; Always return the anticipated result of compilation-exit-message-function
+	  (cons msg code))
 
-    ;; Specify my function (maybe I should have done a lambda function)
-    (setq compilation-exit-message-function 'hamza/compilation-exit-autoclose)
+	;; Specify my function (maybe I should have done a lambda function)
+	(setq compilation-exit-message-function 'hamza/compilation-exit-autoclose)
 
-    (defun hamza/align-comments-// (beginning end)
-      "Align instances of // within marked region."
-      (interactive "*r")
-      (let (indent-tabs-mode align-to-tab-stop)
+	(defun hamza/align-comments-// (beginning end)
+	  "Align instances of // within marked region."
+	  (interactive "*r")
+	  (let (indent-tabs-mode align-to-tab-stop)
 	(align-regexp beginning end "\\(\\s-*\\)//")))
 
-    (defun hamza/align-comments-\;\; (beginning end)
-      "Align instances of // within marked region."
-      (interactive "*r")
-      (let (indent-tabs-mode align-to-tab-stop)
+	(defun hamza/align-comments-\;\; (beginning end)
+	  "Align instances of // within marked region."
+	  (interactive "*r")
+	  (let (indent-tabs-mode align-to-tab-stop)
 	(align-regexp beginning end "\\(\\s-*\\);;")))
 
-    (defun hamza/align-comments-// (beginning end)
-      "Align instances of // within marked region."
-      (interactive "*r")
-      (let (indent-tabs-mode align-to-tab-stop)
+	(defun hamza/align-comments-// (beginning end)
+	  "Align instances of // within marked region."
+	  (interactive "*r")
+	  (let (indent-tabs-mode align-to-tab-stop)
 	(align-regexp beginning end "\\(\\s-*\\)//")))
 
-    (defun hamza/olivetti-resize (size)
-      (interactive "NPlease Enter the width: ")
-      (setq olivetti-body-width size)
-      (setq fill-column size))
+	(defun hamza/olivetti-resize (size)
+	  (interactive "NPlease Enter the width: ")
+	  (setq olivetti-body-width size)
+	  (setq fill-column size))
 
-    (defun hamza/default-olivetti-resize ()
-      (interactive)
-      (setq olivetti-body-width 90)
-      (setq fill-column 80))
+	(defun hamza/default-olivetti-resize ()
+	  (interactive)
+	  (setq olivetti-body-width 90)
+	  (setq fill-column 80))
 
-    ;; (defun hamza/get-auto-fill-paragraph ()
-    ;;   ;; (move-beginning-of-line)
-    ;;   ;; (move-end-of-line)
-    ;;   ;; (forward-char)
-    ;;   ;; (move-beginning-of-line)
-    ;;   ;; (line-number-at-pos)
-    ;;   ;; (current-column)
-    ;;   ;; (while (> (point) (end-of-line)
+	;; (defun hamza/get-auto-fill-paragraph ()
+	;;   ;; (move-beginning-of-line)
+	;;   ;; (move-end-of-line)
+	;;   ;; (forward-char)
+	;;   ;; (move-beginning-of-line)
+	;;   ;; (line-number-at-pos)
+	;;   ;; (current-column)
+	;;   ;; (while (> (point) (end-of-line)
 
-    ;;   (interactive)
+	;;   (interactive)
 
-    ;;   ;; How many chars in a line
-    ;;   (setq original-pos (point))
-    ;;   (move-end-of-line 1)
-    ;;   (setq chars-in-line (- (current-column) 1))
+	;;   ;; How many chars in a line
+	;;   (setq original-pos (point))
+	;;   (move-end-of-line 1)
+	;;   (setq chars-in-line (- (current-column) 1))
 
-    ;;   ;(setq lines-in-buffer)
-    ;;   ;;(when (  ))
-    ;;   (if (>= chars-in-line fill-column)
-    ;; 	  (progn
-    ;; 		(fill-paragraph)
-    ;; 		(forward-line 1)))
-    ;;   (goto-char original-pos))
+	;;   ;(setq lines-in-buffer)
+	;;   ;;(when (  ))
+	;;   (if (>= chars-in-line fill-column)
+	;; 	  (progn
+	;; 		(fill-paragraph)
+	;; 		(forward-line 1)))
+	;;   (goto-char original-pos))
 
-    (defun hamza/flyspell-save-word (bool)
-      (interactive (list (y-or-n-p (concat "Do you want to save the current word, \"" (word-at-point) "\""))))
-      (if bool
-      (let ((current-location (point))
-	     (word (flyspell-get-word)))
+	(defun hamza/flyspell-save-word (bool)
+	  (interactive (list (y-or-n-p (concat "Do you want to save the current word, \"" (word-at-point) "\""))))
+	  (if bool
+	  (let ((current-location (point))
+		 (word (flyspell-get-word)))
 	(when (consp word)
 	  (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location)))))
 
-    ;; (defun hamza/do-the-thing? (bool)
-    ;;   (setq ungabunga "mission assasinate")
-    ;;
-    ;;   ;;(y-or-n-p (concat "Do you want to do it?" ungabunga))))
-    ;;   ;;(interactive (list (read-string "dope right? ")
-    ;;   ;;  				   (y-or-n-p "Do you want to do it?")))
-    ;;
-    ;;   (interactive (list (y-or-n-p (concat "Do you want to do it? \"" (word-at-point) "\""))))
-    ;;
-    ;;   (if bool (message "Here is your ungabunga: %s" ungabunga)))
-    ;;
+	;; (defun hamza/do-the-thing? (bool)
+	;;   (setq ungabunga "mission assasinate")
+	;;
+	;;   ;;(y-or-n-p (concat "Do you want to do it?" ungabunga))))
+	;;   ;;(interactive (list (read-string "dope right? ")
+	;;   ;;  				   (y-or-n-p "Do you want to do it?")))
+	;;
+	;;   (interactive (list (y-or-n-p (concat "Do you want to do it? \"" (word-at-point) "\""))))
+	;;
+	;;   (if bool (message "Here is your ungabunga: %s" ungabunga)))
+	;;
 
-    ;; Useless automatically indents
+	;; Useless automatically indents
 
-    ;; (defun hamza/emmet-tab ()
-    ;;   (interactive)
-    ;;   (if (looking-at "\\_>")
-    ;;       (emmet-expand-line nil)
-    ;;     (indent-according-to-mode)))
+	;; (defun hamza/emmet-tab ()
+	;;   (interactive)
+	;;   (if (looking-at "\\_>")
+	;;       (emmet-expand-line nil)
+	;;     (indent-according-to-mode)))
+
+	(defun hamza/reload-config ()
+      (interactive)
+	  (setq my-org-config-file (concat user-emacs-directory "init.org"))
+	  (setq my-config-file (concat user-emacs-directory "org-init.el"))
+	  (org-babel-tangle-file my-org-config-file)
+	  (load-file my-config-file))
   #+end_src
 
 * Keybindings
@@ -1600,6 +1633,7 @@
 
        ;;; Toggle
        "t" '(:ignore t :which-key "Toggle")
+       "tf" '(flyspell-mode :which-key "Flyspell")
        "tt" '(treemacs :which-key "Treemacs")
        "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
        "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
@@ -1623,6 +1657,7 @@
        "ols" '(org-store-link :which-key "Store Link")
        ;; Code / Babel
        "oc" '(:ignore t :which-key "Code")
+       "ocr" '(hamza/reload-config :which-key "Reload Config")
        "occ" '(org-babel-execute-src-block :which-key "Compile")
        "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
        ;; Org Roam
