@@ -6,7 +6,7 @@
  delete-by-moving-to-trash t  ; Delete files to trash
  backup-directory-alist `(("." . "~/.saves"))
  ;; print a default message in the empty scratch buffer opened at startup
- initial-scratch-message ";; Welcome to Emacs!\n\n")
+ initial-scratch-message ";; Welcome to Groovemacs!\n\n")
 
 ;; Icons in doom modeline are turned off by design when run from daemon
 (setq doom-modeline-icon t)
@@ -30,12 +30,35 @@
 	(unless (frame-focus-state)
 	(garbage-collect))))
 
-;; Set font and font size
+;; TODO: Which-key gets covered up with minibuffer if font size is 13 or above
+
+;; (defun my-frame-tweaks (&optional frame)
+;;   "My personal frame tweaks."
+;;   (interactive)
+;;   (unless frame
+;; 	(setq frame (selected-frame)))
+;;   (when frame
+;; 	(with-selected-frame frame
+;; 	(when (display-graphic-p)
+;;   (set-face-attribute 'default nil :font "Mononoki" :height 120)
+;;   (let ((faces '(mode-line
+;; 		  mode-line-buffer-id
+;; 		  mode-line-emphasis
+;; 		  mode-line-highlight
+;; 		  mode-line-inactive)))
+;; 	  (mapc
+;; 	  (lambda (face) (set-face-attribute face nil
+;; 						:font "Mononoki-12")) faces))))))
 
 ;; Default font size
-(set-face-attribute 'default nil :font "Mononoki" :height 150) ;; :height 118
+;(set-face-attribute 'default nil :font "Mononoki" :height 125) ;; :height 118
+
+;(my-frame-tweaks)
+;(add-hook 'after-make-frame-functions #'my-frame-tweaks t)
 
 
+(add-to-list 'default-frame-alist '(font . "Mononoki-13"))
+(set-face-attribute 'default t :font "Mononoki-13")
 
 ;;; Default to utf-8 encoding
 (set-default-coding-systems 'utf-8)
@@ -47,14 +70,14 @@
 (prefer-coding-system 'utf-8)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 
-(let ((faces '(mode-line
-			  mode-line-buffer-id
-			  mode-line-emphasis
-			  mode-line-highlight
-			  mode-line-inactive)))
-	(mapc
-	 (lambda (face) (set-face-attribute face nil :font "Monospace-10"))
-	 faces))
+;; (let ((faces '(mode-line
+;; 			  mode-line-buffer-id
+;; 			  mode-line-emphasis
+;; 			  mode-line-highlight
+;; 			  mode-line-inactive)))
+;; 	(mapc
+;; 	 (lambda (face) (set-face-attribute face nil :font "Monospace-10"))
+;; 	 faces))
 
 ;;(add-to-list 'load-path "~/.emacs.d/")
 
@@ -222,14 +245,15 @@
   (global-command-log-mode))
 
 (use-package pcre2el
-  :config 
+  :config
   (pcre-mode 0))
 
 ;; Jump around very conveniently
 (use-package avy)
 
 ;; Search with regexp and others
-(use-package anzu)
+(use-package anzu
+  :defer t)
 
 (use-package ranger
   :defer t)
@@ -238,80 +262,88 @@
   :init (load-theme 'doom-gruvbox t))
 
 (use-package centaur-tabs
-  :bind (:map evil-normal-state-map
-	  ("g t" . centaur-tabs-forward)
-	      ("g T" . centaur-tabs-backward))
-  :config
-  (setq centaur-tabs-style 'box
-	centaur-tabs-set-bar 'over        ;; Set a bar 'over 'under 'left ... of the tab denoting which tab we are on
-	x-underline-at-descent-line t      ;; If not using spacemacs this will display bar correctly
-	centaur-tabs-set-icons t           ;; show icons in tabs
-	centaur-gray-out-icons nil         ;; if set to 'buffer gray out icons of any buffer tab like *scrath* or dired
-	centaur-tabs-height 24             ;; set tab height
-	centaur-tabs-set-modified-marker t ;; we want to change the "x" icon on the tab when buffer is unsaved
-	centaur-tabs-modified-marker "●")  ;; set the marker for above change
-  (centaur-tabs-mode t))
+    :bind (:map evil-normal-state-map
+	    ("g t" . centaur-tabs-forward)
+	    ("g T" . centaur-tabs-backward))
+    :config
+    (setq centaur-tabs-style 'box
+	  centaur-tabs-set-bar 'over        ;; Set a bar 'over 'under 'left ... of the tab denoting which tab we are on
+	  x-underline-at-descent-line t      ;; If not using spacemacs this will display bar correctly
+	  centaur-tabs-set-icons t           ;; show icons in tabs
+	  centaur-gray-out-icons nil         ;; if set to 'buffer gray out icons of any buffer tab like *scrath* or dired
+	  centaur-tabs-height 24             ;; set tab height
+	  centaur-tabs-set-modified-marker t ;; we want to change the "x" icon on the tab when buffer is unsaved
+	  centaur-tabs-modified-marker "●")  ;; set the marker for above change
+:after
+    (centaur-tabs-mode t))
 
-(use-package helm
-  :diminish           ;Removes Helm showing up in modeline
-  :init
-	(require 'helm-config)                       ; Load helm's config
-	(setq helm-move-to-line-cycle-in-source t    ; Cycle to the top when you go past the bottom and vice versa;
-		  helm-split-window-in-side-p t)
-  :config
-	;(helm-mode 1) ;; Most of Emacs prompts become helm-enabled
-	(helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
-	;(global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
-	;(define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
-	(global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
-	(global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
-	(global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
-	(global-set-key (kbd "C-s") 'helm-occur) ;; Replaces the default isearch keybinding
-	(global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
-	(global-set-key (kbd "M-X") 'helm-M-x)  ;; Improved M-x menu
-	(global-set-key (kbd "M-y") 'helm-show-kill-ring))  ;; Show kill ring, pick something to paste
+;; (use-package helm
+;;   :diminish           ;Removes Helm showing up in modeline
+;;   :init
+;; 	(require 'helm-config)                       ; Load helm's config
+;; 	(setq helm-move-to-line-cycle-in-source t    ; Cycle to the top when you go past the bottom and vice versa;
+;; 		  helm-split-window-in-side-p t)
+;;   :config
+;; 	;(helm-mode 1) ;; Most of Emacs prompts become helm-enabled
+;; 	(helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
+;; 	;(global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
+;; 	;(define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
+;; 	(global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
+;; 	(global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
+;; 	(global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
+;; 	(global-set-key (kbd "C-s") 'helm-occur) ;; Replaces the default isearch keybinding
+;; 	(global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
+;; 	(global-set-key (kbd "M-X") 'helm-M-x)  ;; Improved M-x menu
+;; 	(global-set-key (kbd "M-y") 'helm-show-kill-ring))  ;; Show kill ring, pick something to paste
 
-(use-package dash)
-(use-package helm-dash)
+;; (use-package dash)
+;; (use-package helm-dash)
 
 (use-package ivy
-      :diminish
-      :bind (("C-s" . swiper)
-	     :map ivy-minibuffer-map
-	     ("TAB" . ivy-alt-done)
-	     ("C-l" . ivy-alt-done)
-	     ("C-j" . ivy-next-line)
-	     ("C-k" . ivy-previous-line)
-	     :map ivy-switch-buffer-map
-	     ("C-k" . ivy-previous-line)
-	     ("C-l" . ivy-done)
-	     ("C-d" . ivy-switch-buffer-kill)
-	     :map ivy-reverse-i-search-map
-	     ("C-k" . ivy-previous-line)
-	     ("C-d" . ivy-reverse-i-search-kill))
-      :config
-      (ivy-mode 1)
-     '(ivy-initial-inputs-alist nil)
-      (setq ivy-re-builders-alist
-	      '((ivy-switch-buffer . ivy--regex-plus)
-		    (swiper . ivy--regex-plus)
-		    (t . ivy--regex-plus)))) ;; you could use ivy--regex-fuzzy for ULTIMATE Matching
-								     ;; but it is too much for me
+  :diminish
+  :bind (("C-s" . swiper)
+	 :map ivy-minibuffer-map
+	 ("TAB" . ivy-alt-done)
+	 ("C-l" . ivy-alt-done)
+	 ("C-j" . ivy-next-line)
+	 ("C-k" . ivy-previous-line)
+	 :map ivy-switch-buffer-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-l" . ivy-done)
+	 ("C-d" . ivy-switch-buffer-kill)
+	 :map ivy-reverse-i-search-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1)
+ '(ivy-initial-inputs-alist nil)
+  (setq ivy-re-builders-alist
+	  '((ivy-switch-buffer . ivy--regex-plus)
+		(swiper . ivy--regex-plus)
+		(t . ivy--regex-plus)))) ;; you could use ivy--regex-fuzzy for ULTIMATE Matching
+								 ;; but it is too much for me
 
-    ;; Sorts latest commands (faster than smex) to the top
-    (use-package ivy-prescient
-	    :config
-	    (ivy-prescient-mode 1))
+;; Sorts latest commands (faster than smex) to the top
+(use-package ivy-prescient
+	:config
+	(ivy-prescient-mode 1))
 
-    ;; Fuzzy Sort Ivy
-    (use-package flx)
+;; Fuzzy Sort Ivy
+(use-package flx)
 
-    (use-package ivy-rich
-	    :init
-	    (ivy-rich-mode 1))
+;; Shows description and keybinding of function
+;; also colors modes that are on and other tweaks
+(use-package ivy-rich
+	:init
+	(ivy-rich-mode 1))
+
+;; Persist history over Emacs restarts
+(use-package savehist
+  :init
+  (savehist-mode))
 
 ;; Pop up windows for evil-owl and the such
-    (use-package ivy-posframe)
+(use-package ivy-posframe)
 
 (use-package counsel
   :bind (("M-x" . counsel-M-x)))
@@ -386,7 +418,7 @@
   (setq org-agenda-files
 		'("~/wrk/tasks.org"))
 
-  (add-hook 'org-mode-hook 'turn-on-flyspell)
+  ;(add-hook 'org-mode-hook 'turn-on-flyspell)
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
   (setq org-agenda-start-with-log-mode t) ;; present a log
@@ -399,15 +431,18 @@
 ;(global-set-key (kbd "C-c l") 'org-store-link)
 ;(global-set-key (kbd "C-c C-l") 'org-insert-link)
 
+;; Replaced by org-superstar
 ;; (use-package org-bullets
-;;   :config
-;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+;;   :hook (org-mode . org-bullets-mode))
+;;   ;; :config
+;;   ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-;(use-package org-superstar
-;  :hook (org-mode . org-superstar-mode))
-;  ;; :config
-;  ;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
+(use-package org-superstar
+  :hook (org-mode . org-superstar-mode))
+  ;; :config
+  ;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
 
+;; Set Images and Latex Preview size correctly
 (setq org-image-actual-width nil)
 (setq org-hide-emphasis-markers t)
 (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
@@ -435,6 +470,7 @@
 ;;   :custom
 ;;   (org-roam-directory "~/org/org-roam"))
 
+;; Allows drag and drop of images to download
 (use-package org-download)
 
 ;; Drag-and-drop to `dired`
@@ -457,8 +493,8 @@
 ;(setq dired-listting-switches )
 
 (org-babel-do-load-languages 'org-babel-load-languages
-  '((shell . t)
-    (latex . t)))
+   '((shell . t)
+(latex . t)))
 
 (use-package projectile
   :defer t)
@@ -529,8 +565,6 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
-;; (setq evil-want-keybinding nil) ; Adds more vim bindings to other parts of emacs. I use evil-collection instead
-
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -555,8 +589,8 @@
   ;; (define-key evil-normal-state-map (kbd "C-l i") 'org-insert-link)
   ;; (define-key evil-normal-state-map (kbd "C-l s") 'org-store-link)
 
-  (define-key evil-normal-state-map (kbd "J") 'pixel-scroll-up)
-  (define-key evil-normal-state-map (kbd "K") 'pixel-scroll-down)
+  ;; (define-key evil-normal-state-map (kbd "J") 'pixel-scroll-up)
+  ;; (define-key evil-normal-state-map (kbd "K") 'pixel-scroll-down)
 
   (define-key evil-normal-state-map (kbd "g l") 'evil-avy-goto-line)
   (define-key evil-normal-state-map (kbd "g w") 'evil-avy-goto-word-or-subword-1)
@@ -633,7 +667,7 @@
 (use-package evil-mc
       :after evil
       :config
-      (evil-mc-mode t))
+      (global-evil-mc-mode t))
 
 ;; Pops up a window and allows you to view registers and marks before using them.
 (use-package evil-owl
@@ -661,7 +695,7 @@
 
       (evil-owl-mode))
 
-;; comment without select   ing and more effecient, does not need evil
+;; comment without selecting and more effecient, does not need evil
 (use-package evil-nerd-commenter
       :after evil)
 
@@ -784,7 +818,13 @@
 ;;   (meow-setup-indicator))
 
 ;; Cursors start
-(use-package multiple-cursors)
+(use-package multiple-cursors
+  :config
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+
 (use-package visual-regexp-steroids
   :config
   (define-key global-map (kbd "C-c r") 'vr/replace)
@@ -797,14 +837,15 @@
   ;; if you use multiple-cursors, this is for you:
   (define-key global-map (kbd "C-c m") 'vr/mc-mark))
 
-;; (use-package evil-multiedit
-;;   :config
-;;   (evil-multiedit-default-keybinds))
-
 (use-package evil-multiedit
-:after evil
-:config
-(setq evil-multiedit-follow-matches t))
+  :after evil
+  :config
+  (evil-multiedit-default-keybinds))
+
+;; (use-package evil-multiedit
+;; :after evil
+;; :config
+;; (setq evil-multiedit-follow-matches t))
 
 
 
@@ -812,13 +853,13 @@
 (use-package hydra
   :defer 2
   :bind ("C-c c" . hydra-clock/body)
-		("C-c z" . hydra-zoom/body)
+		("C-c z" . hydra-mc/body)
 		("C-c r" . 'hydra-launcher/body))
 
 (defhydra hydra-zoom ()
   "zoom"
   ("k" text-scale-increase "in")
-  ("l" text-scale-decrease "out"))
+  ("j" text-scale-decrease "out"))
 
 (defhydra hydra-launcher (:color blue)
    "Launch"
@@ -859,6 +900,10 @@
 	("o" org-clock-out)
 	("r" org-clock-report))
 
+(use-package direnv
+  :config
+  (direnv-mode))
+
 (use-package term
   :config
   (setq explicit-shell-file-name "bash")
@@ -874,7 +919,7 @@
   (interactive)
   (when vterm--process
 	(let* ((pid (process-id vterm--process))
-		   (dir (file-truename (format "/proc/%d/cwd/" pid))))
+			(dir (file-truename (format "/proc/%d/cwd/" pid))))
 	  (setq default-directory dir))))
 
 (use-package vterm
@@ -884,7 +929,42 @@
   ;;(setq vterm-shell "zsh")
   (setq vterm-max-scrollback 10000))
 
-;(advice-add :before #'find-file #'vterm-directory-sync)
+(use-package multi-vterm
+  :config
+  (add-hook 'vterm-mode-hook
+	(lambda ()
+	  ;(setq-local evil-insert-state-cursor 'box)
+	  (evil-insert-state)))
+  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+
+  (setq vterm-keymap-exceptions nil)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd ",c")       #'multi-vterm)
+  (evil-define-key 'normal vterm-mode-map (kbd ",n")       #'multi-vterm-next)
+  (evil-define-key 'normal vterm-mode-map (kbd ",p")       #'multi-vterm-prev)
+  (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
+
+										;(advice-add :before #'find-file #'vterm-directory-sync)
 
 (defun vterm-find-file ()
   "Start vterm-directory-sync before find-file"
@@ -939,10 +1019,10 @@
   :config
   (setq TeX-source-correlate-mode t                            ;; Forward and inverse search
 		TeX-source-correlate-method 'synctex                   ;; Search forward and backward with synctex method
-		TeX-auto-save t                                        ;; Auto save file if not saved within certain time 
-		TeX-parse-self t)                                      ;; Parse file after loading it if no style hook is found for it. 
+		TeX-auto-save t                                        ;; Auto save file if not saved within certain time
+		TeX-parse-self t)                                      ;; Parse file after loading it if no style hook is found for it.
   (setq-default TeX-master "paper.tex")                        ;; Master file associated with the current buffer
-  (setq reftex-plug-into-AUCTeX t)                             ;; Use reftex with auctex 
+  (setq reftex-plug-into-AUCTeX t)                             ;; Use reftex with auctex
   (pdf-tools-install)                                          ;; Make sure pdf-tools is setup
   (setq TeX-view-program-selection '((output-pdf "PDF Tools")) ;; Output through pdf-tools
 		TeX-source-correlate-start-server t)                   ;; Start the search server with tex
@@ -1005,6 +1085,24 @@
 ;; (use-package dap-mode)
 ;; (use-package dap-haskell) ; to load the dap adapter for haskell
 
+;; (use-package slime
+;; 	:config
+;; 	(setq inferior-lisp-program "sbcl"))
+
+;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(use-package sly
+  :config
+  (setq inferior-lisp-program "sbcl")
+  ;; (add-hook 'sly-mode-hook 'set-up-sly-ac)
+  ;; (eval-after-load 'auto-complete
+  ;;   '(add-to-list 'ac-modes 'sly-mrepl-mode))
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
+
 (use-package hindent
   :defer t)
 
@@ -1049,12 +1147,9 @@
       :defer t)
 
 (use-package j-mode
-	:defer t)
-
-(use-package j-mode
-:defer t
-:init
-(setq j-console-cmd "jconsole"))
+   :defer t
+   :init
+   (setq j-console-cmd "jconsole"))
 
 (use-package nix-mode
       :defer t)
@@ -1180,153 +1275,160 @@
 ;;   (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the
 
 (defun hamza/insert-line-below ()
-  "Insert an empty line below the current line."
-  (interactive)
-  (save-excursion
-    (end-of-line)
-    (open-line 1)))
+    "Insert an empty line below the current line."
+    (interactive)
+    (save-excursion
+  (end-of-line)
+  (open-line 1)))
 
-(defun hamza/insert-line-above ()
-  "insert an empty line above the current line."
-  (interactive)
-  (save-excursion
-    (end-of-line 0)
-    (open-line 1)))
+  (defun hamza/insert-line-above ()
+    "insert an empty line above the current line."
+    (interactive)
+    (save-excursion
+  (end-of-line 0)
+  (open-line 1)))
 
-(defun hamza/remove-line-below ()
-  "Remove the line below the current line."
-  (interactive)
-  (save-excursion
-    (next-line)
-    (kill-whole-line)))
+  (defun hamza/remove-line-below ()
+    "Remove the line below the current line."
+    (interactive)
+    (save-excursion
+  (next-line)
+  (kill-whole-line)))
 
-(defun hamza/remove-line-above ()
-  "Remove the line above the current line."
-  (interactive)
-  (save-excursion
-    (previous-line)
-    (kill-whole-line)))
+  (defun hamza/remove-line-above ()
+    "Remove the line above the current line."
+    (interactive)
+    (save-excursion
+  (previous-line)
+  (kill-whole-line)))
 
-(defun hamza/insert-and-goto-line-below ()
-  "Insert a line below the current line and move to it"
-  (interactive)
-  (save-excursion
-    (end-of-line)
-    (open-line 1)))
+  (defun hamza/insert-and-goto-line-below ()
+    "Insert a line below the current line and move to it"
+    (interactive)
+    (save-excursion
+  (end-of-line)
+  (open-line 1)))
 
-(defun hamza/insert-and-goto-line-above ()
-  "Insert a line above the current line and move to it"
-  (interactive)
-  (save-excursion
-    (end-of-line)
-    (open-line 1)))
+  (defun hamza/insert-and-goto-line-above ()
+    "Insert a line above the current line and move to it"
+    (interactive)
+    (save-excursion
+  (end-of-line)
+  (open-line 1)))
 
-(defun hamza/download-url (url path)
-  "Downloads a file from a URL.
-Argument PATH Where to save on your computer."
-  (interactive "MPlease Enter URL: \nFPlease Enter the File to Save to: ")
-  (url-copy-file url path))
+  (defun hamza/download-url (url path)
+    "Downloads a file from a URL.
+  Argument PATH Where to save on your computer."
+    (interactive "MPlease Enter URL: \nFPlease Enter the File to Save to: ")
+    (url-copy-file url path))
 
-;; Open Image in another program
-(defun hamza/open-image-externally (x)
-  "Takes an image and opens in GIMP or any other external program.
-Argument X The image file path."
-  (interactive "FPlease Enter an Image: ")
-  ;;(start-process "" nil "xfce4-terminal"))
-  (shell-command (concat "gimp " x)))
+  ;; Open Image in another program
+  (defun hamza/open-image-externally (x)
+    "Takes an image and opens in GIMP or any other external program.
+  Argument X The image file path."
+    (interactive "FPlease Enter an Image: ")
+    ;;(start-process "" nil "xfce4-terminal"))
+    (shell-command (concat "gimp " x)))
 
-;; Helper for compilation. Close the compilation window if
-;; there was no error at all. (emacs wiki)
-(defun hamza/compilation-exit-autoclose (status code msg)
-  "If <M-x> compile exists with a 0 then bury the *compilation* buffer, so that C-x b doesn't go there and delete the *compilation* window."
-  (when (and (eq status 'exit) (zerop code))
-    (bury-buffer)
-    (delete-window (get-buffer-window (get-buffer "*compilation*"))))
-  ;; Always return the anticipated result of compilation-exit-message-function
-  (cons msg code))
+  ;; Helper for compilation. Close the compilation window if
+  ;; there was no error at all. (emacs wiki)
+  (defun hamza/compilation-exit-autoclose (status code msg)
+    "If <M-x> compile exists with a 0 then bury the *compilation* buffer, so that C-x b doesn't go there and delete the *compilation* window."
+    (when (and (eq status 'exit) (zerop code))
+  (bury-buffer)
+  (delete-window (get-buffer-window (get-buffer "*compilation*"))))
+    ;; Always return the anticipated result of compilation-exit-message-function
+    (cons msg code))
 
-;; Specify my function (maybe I should have done a lambda function)
-(setq compilation-exit-message-function 'hamza/compilation-exit-autoclose)
+  ;; Specify my function (maybe I should have done a lambda function)
+  (setq compilation-exit-message-function 'hamza/compilation-exit-autoclose)
 
-(defun hamza/align-comments-// (beginning end)
-  "Align instances of // within marked region."
-  (interactive "*r")
-  (let (indent-tabs-mode align-to-tab-stop)
-    (align-regexp beginning end "\\(\\s-*\\)//")))
+  (defun hamza/align-comments-// (beginning end)
+    "Align instances of // within marked region."
+    (interactive "*r")
+    (let (indent-tabs-mode align-to-tab-stop)
+  (align-regexp beginning end "\\(\\s-*\\)//")))
 
-(defun hamza/align-comments-\;\; (beginning end)
-  "Align instances of // within marked region."
-  (interactive "*r")
-  (let (indent-tabs-mode align-to-tab-stop)
-    (align-regexp beginning end "\\(\\s-*\\);;")))
+  (defun hamza/align-comments-\;\; (beginning end)
+    "Align instances of // within marked region."
+    (interactive "*r")
+    (let (indent-tabs-mode align-to-tab-stop)
+  (align-regexp beginning end "\\(\\s-*\\);;")))
 
-(defun hamza/align-comments-// (beginning end)
-  "Align instances of // within marked region."
-  (interactive "*r")
-  (let (indent-tabs-mode align-to-tab-stop)
-    (align-regexp beginning end "\\(\\s-*\\)//")))
+  (defun hamza/align-comments-// (beginning end)
+    "Align instances of // within marked region."
+    (interactive "*r")
+    (let (indent-tabs-mode align-to-tab-stop)
+  (align-regexp beginning end "\\(\\s-*\\)//")))
 
-(defun hamza/olivetti-resize (size)
-  (interactive "NPlease Enter the width: ")
-  (setq olivetti-body-width size)
-  (setq fill-column size))
+  (defun hamza/olivetti-resize (size)
+    (interactive "NPlease Enter the width: ")
+    (setq olivetti-body-width size)
+    (setq fill-column size))
 
-(defun hamza/default-olivetti-resize ()
-  (interactive)
-  (setq olivetti-body-width 90)
-  (setq fill-column 80))
+  (defun hamza/default-olivetti-resize ()
+    (interactive)
+    (setq olivetti-body-width 90)
+    (setq fill-column 80))
 
-;; (defun hamza/get-auto-fill-paragraph ()
-;;   ;; (move-beginning-of-line)
-;;   ;; (move-end-of-line)
-;;   ;; (forward-char)
-;;   ;; (move-beginning-of-line)
-;;   ;; (line-number-at-pos)
-;;   ;; (current-column)
-;;   ;; (while (> (point) (end-of-line)
+  ;; (defun hamza/get-auto-fill-paragraph ()
+  ;;   ;; (move-beginning-of-line)
+  ;;   ;; (move-end-of-line)
+  ;;   ;; (forward-char)
+  ;;   ;; (move-beginning-of-line)
+  ;;   ;; (line-number-at-pos)
+  ;;   ;; (current-column)
+  ;;   ;; (while (> (point) (end-of-line)
 
-;;   (interactive)
+  ;;   (interactive)
 
-;;   ;; How many chars in a line
-;;   (setq original-pos (point))
-;;   (move-end-of-line 1)
-;;   (setq chars-in-line (- (current-column) 1))
+  ;;   ;; How many chars in a line
+  ;;   (setq original-pos (point))
+  ;;   (move-end-of-line 1)
+  ;;   (setq chars-in-line (- (current-column) 1))
 
-;;   ;(setq lines-in-buffer)
-;;   ;;(when (  ))
-;;   (if (>= chars-in-line fill-column)
-;; 	  (progn
-;; 		(fill-paragraph)
-;; 		(forward-line 1)))
-;;   (goto-char original-pos))
+  ;;   ;(setq lines-in-buffer)
+  ;;   ;;(when (  ))
+  ;;   (if (>= chars-in-line fill-column)
+  ;; 	  (progn
+  ;; 		(fill-paragraph)
+  ;; 		(forward-line 1)))
+  ;;   (goto-char original-pos))
 
-(defun hamza/flyspell-save-word (bool)
-  (interactive (list (y-or-n-p (concat "Do you want to save the current word, \"" (word-at-point) "\""))))
-  (if bool
-  (let ((current-location (point))
-	 (word (flyspell-get-word)))
-    (when (consp word)
-      (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location)))))
+  (defun hamza/flyspell-save-word (bool)
+    (interactive (list (y-or-n-p (concat "Do you want to save the current word, \"" (word-at-point) "\""))))
+    (if bool
+    (let ((current-location (point))
+	   (word (flyspell-get-word)))
+  (when (consp word)
+    (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location)))))
 
-;; (defun hamza/do-the-thing? (bool)
-;;   (setq ungabunga "mission assasinate")
-;;
-;;   ;;(y-or-n-p (concat "Do you want to do it?" ungabunga))))
-;;   ;;(interactive (list (read-string "dope right? ")
-;;   ;;  				   (y-or-n-p "Do you want to do it?")))
-;;
-;;   (interactive (list (y-or-n-p (concat "Do you want to do it? \"" (word-at-point) "\""))))
-;;
-;;   (if bool (message "Here is your ungabunga: %s" ungabunga)))
-;;
+  ;; (defun hamza/do-the-thing? (bool)
+  ;;   (setq ungabunga "mission assasinate")
+  ;;
+  ;;   ;;(y-or-n-p (concat "Do you want to do it?" ungabunga))))
+  ;;   ;;(interactive (list (read-string "dope right? ")
+  ;;   ;;  				   (y-or-n-p "Do you want to do it?")))
+  ;;
+  ;;   (interactive (list (y-or-n-p (concat "Do you want to do it? \"" (word-at-point) "\""))))
+  ;;
+  ;;   (if bool (message "Here is your ungabunga: %s" ungabunga)))
+  ;;
 
-;; Useless automatically indents
+  ;; Useless automatically indents
 
-;; (defun hamza/emmet-tab ()
-;;   (interactive)
-;;   (if (looking-at "\\_>")
-;;       (emmet-expand-line nil)
-;;     (indent-according-to-mode)))
+  ;; (defun hamza/emmet-tab ()
+  ;;   (interactive)
+  ;;   (if (looking-at "\\_>")
+  ;;       (emmet-expand-line nil)
+  ;;     (indent-according-to-mode)))
+
+  (defun hamza/reload-config ()
+(interactive)
+    (setq my-org-config-file (concat user-emacs-directory "init.org"))
+    (setq my-config-file (concat user-emacs-directory "org-init.el"))
+    (org-babel-tangle-file my-org-config-file)
+    (load-file my-config-file))
 
 (global-set-key (kbd "M-j") 'hamza/insert-line-below)
 (global-set-key (kbd "M-k") 'hamza/insert-line-above)
@@ -1411,6 +1513,7 @@ Argument X The image file path."
 
    ;;; Toggle
    "t" '(:ignore t :which-key "Toggle")
+   "tf" '(flyspell-mode :which-key "Flyspell")
    "tt" '(treemacs :which-key "Treemacs")
    "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
    "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
@@ -1434,6 +1537,7 @@ Argument X The image file path."
    "ols" '(org-store-link :which-key "Store Link")
    ;; Code / Babel
    "oc" '(:ignore t :which-key "Code")
+   "ocr" '(hamza/reload-config :which-key "Reload Config")
    "occ" '(org-babel-execute-src-block :which-key "Compile")
    "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
    ;; Org Roam

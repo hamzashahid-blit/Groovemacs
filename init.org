@@ -17,7 +17,7 @@
 	 delete-by-moving-to-trash t  ; Delete files to trash
 	 backup-directory-alist `(("." . "~/.saves"))
 	 ;; print a default message in the empty scratch buffer opened at startup
-	 initial-scratch-message ";; Welcome to Emacs!\n\n")
+	 initial-scratch-message ";; Welcome to Groovemacs!\n\n")
 
 	;; Icons in doom modeline are turned off by design when run from daemon
 	(setq doom-modeline-icon t)
@@ -250,41 +250,42 @@
 
 * Basic Packages
   #+begin_src emacs-lisp
-    (use-package hl-line
-      :config
-      (global-hl-line-mode 1))
-    ; (set-face-attribute 'hl-line nil :background "gray21"))
+	(use-package hl-line
+	  :config
+	  (global-hl-line-mode 1))
+	; (set-face-attribute 'hl-line nil :background "gray21"))
 
-    (use-package restart-emacs
-      :defer t)
+	(use-package restart-emacs
+	  :defer t)
 
-    ;; Allows you to "try" a package without installing it
-    (use-package try
-      :defer t)
+	;; Allows you to "try" a package without installing it
+	(use-package try
+	  :defer t)
 
-    ;; Power of Emacs' powerful undo system more intuitivily. Inspired by VIM
-    (use-package undo-tree
-      :config
-      (global-undo-tree-mode))
+	;; Power of Emacs' powerful undo system more intuitivily. Inspired by VIM
+	(use-package undo-tree
+	  :config
+	  (global-undo-tree-mode))
 
-    (use-package command-log-mode        ; See which commands are run and the output of them in a side window
-      :defer t
-      :diminish                          ; Removes command-log showing up in modeline
-      :config
-      (global-command-log-mode))
+	(use-package command-log-mode        ; See which commands are run and the output of them in a side window
+	  :defer t
+	  :diminish                          ; Removes command-log showing up in modeline
+	  :config
+	  (global-command-log-mode))
 
-    (use-package pcre2el
-      :config
-      (pcre-mode 0))
+	(use-package pcre2el
+	  :config
+	  (pcre-mode 0))
 
-    ;; Jump around very conveniently
-    (use-package avy)
+	;; Jump around very conveniently
+	(use-package avy)
 
-    ;; Search with regexp and others
-    (use-package anzu)
+	;; Search with regexp and others
+	(use-package anzu
+	  :defer t)
 
-    (use-package ranger
-      :defer t)
+	(use-package ranger
+	  :defer t)
  #+end_src
 
 * Theme
@@ -312,29 +313,29 @@
 	  (centaur-tabs-mode t))
   #+end_src
 
-* Helm
+* Helm [Disabled]
   #+begin_src emacs-lisp
-	(use-package helm
-	  :diminish           ;Removes Helm showing up in modeline
-	  :init
-		(require 'helm-config)                       ; Load helm's config
-		(setq helm-move-to-line-cycle-in-source t    ; Cycle to the top when you go past the bottom and vice versa;
-			  helm-split-window-in-side-p t)
-	  :config
-		;(helm-mode 1) ;; Most of Emacs prompts become helm-enabled
-		(helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
-		;(global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
-		;(define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
-		(global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
-		(global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
-		(global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
-		(global-set-key (kbd "C-s") 'helm-occur) ;; Replaces the default isearch keybinding
-		(global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
-		(global-set-key (kbd "M-X") 'helm-M-x)  ;; Improved M-x menu
-		(global-set-key (kbd "M-y") 'helm-show-kill-ring))  ;; Show kill ring, pick something to paste
+	;; (use-package helm
+	;;   :diminish           ;Removes Helm showing up in modeline
+	;;   :init
+	;; 	(require 'helm-config)                       ; Load helm's config
+	;; 	(setq helm-move-to-line-cycle-in-source t    ; Cycle to the top when you go past the bottom and vice versa;
+	;; 		  helm-split-window-in-side-p t)
+	;;   :config
+	;; 	;(helm-mode 1) ;; Most of Emacs prompts become helm-enabled
+	;; 	(helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
+	;; 	;(global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
+	;; 	;(define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
+	;; 	(global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
+	;; 	(global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
+	;; 	(global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
+	;; 	(global-set-key (kbd "C-s") 'helm-occur) ;; Replaces the default isearch keybinding
+	;; 	(global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
+	;; 	(global-set-key (kbd "M-X") 'helm-M-x)  ;; Improved M-x menu
+	;; 	(global-set-key (kbd "M-y") 'helm-show-kill-ring))  ;; Show kill ring, pick something to paste
 
-	(use-package dash)
-	(use-package helm-dash)
+	;; (use-package dash)
+	;; (use-package helm-dash)
   #+end_src
 
 * Ivy
@@ -371,11 +372,18 @@
 	;; Fuzzy Sort Ivy
 	(use-package flx)
 
+	;; Shows description and keybinding of function
+	;; also colors modes that are on and other tweaks
 	(use-package ivy-rich
 		:init
 		(ivy-rich-mode 1))
 
-    ;; Pop up windows for evil-owl and the such
+	;; Persist history over Emacs restarts
+	(use-package savehist
+	  :init
+	  (savehist-mode))
+
+	;; Pop up windows for evil-owl and the such
 	(use-package ivy-posframe)
   #+end_src
 
@@ -483,16 +491,18 @@
 	 ;(global-set-key (kbd "C-c l") 'org-store-link)
 	 ;(global-set-key (kbd "C-c C-l") 'org-insert-link)
 
-	 (use-package org-bullets
-	   :hook (org-mode . org-bullets-mode))
-	   ;; :config
-	   ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+	 ;; Replaced by org-superstar
+	 ;; (use-package org-bullets
+	 ;;   :hook (org-mode . org-bullets-mode))
+	 ;;   ;; :config
+	 ;;   ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 	 (use-package org-superstar
 	   :hook (org-mode . org-superstar-mode))
 	   ;; :config
 	   ;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
 
+	 ;; Set Images and Latex Preview size correctly
 	 (setq org-image-actual-width nil)
 	 (setq org-hide-emphasis-markers t)
 	 (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
@@ -520,6 +530,7 @@
 	 ;;   :custom
 	 ;;   (org-roam-directory "~/org/org-roam"))
 
+	 ;; Allows drag and drop of images to download
 	 (use-package org-download)
 
 	 ;; Drag-and-drop to `dired`
@@ -547,9 +558,9 @@
 
 ** Babel
    #+begin_src emacs-lisp
-     (org-babel-do-load-languages 'org-babel-load-languages
-       '((shell . t)
-	 (latex . t)))
+	 (org-babel-do-load-languages 'org-babel-load-languages
+	   '((shell . t)
+	(latex . t)))
    #+end_src
 
 * Projectile
@@ -643,8 +654,6 @@
 ** Evil
 *** Evil Basic
   #+begin_src emacs-lisp
-	;; (setq evil-want-keybinding nil) ; Adds more vim bindings to other parts of emacs. I use evil-collection instead
-
 	(use-package evil
 	  :init
 	  (setq evil-want-integration t)
@@ -669,8 +678,8 @@
 	  ;; (define-key evil-normal-state-map (kbd "C-l i") 'org-insert-link)
 	  ;; (define-key evil-normal-state-map (kbd "C-l s") 'org-store-link)
 
-	  (define-key evil-normal-state-map (kbd "J") 'pixel-scroll-up)
-	  (define-key evil-normal-state-map (kbd "K") 'pixel-scroll-down)
+	  ;; (define-key evil-normal-state-map (kbd "J") 'pixel-scroll-up)
+	  ;; (define-key evil-normal-state-map (kbd "K") 'pixel-scroll-down)
 
 	  (define-key evil-normal-state-map (kbd "g l") 'evil-avy-goto-line)
 	  (define-key evil-normal-state-map (kbd "g w") 'evil-avy-goto-word-or-subword-1)
@@ -768,7 +777,7 @@
 	  (use-package evil-mc
 		:after evil
 		:config
-		(evil-mc-mode t))
+		(global-evil-mc-mode t))
 	#+end_src
 
 *** Owl
@@ -802,7 +811,7 @@
 
 *** Nerd Commenter
 	#+begin_src emacs-lisp
-	  ;; comment without select   ing and more effecient, does not need evil
+	  ;; comment without selecting and more effecient, does not need evil
 	  (use-package evil-nerd-commenter
 		:after evil)
     #+end_src
@@ -823,14 +832,14 @@
 	 ;;   (xah-fly-keys-set-layout "qwerty"))
    #+end_src
 
-** Boon
+** Boon [Disabled]
   #+begin_src emacs-lisp
 	;; (use-package boon
 	;;   :config
 	;;   (require 'boon-qwerty))
   #+end_src
 
-** Meow
+** Meow [Disabled]
   #+begin_src emacs-lisp
 	;; (defun meow-setup ()
 	;;   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -940,7 +949,13 @@
 * Cursors
   #+begin_src emacs-lisp
 	;; Cursors start
-	(use-package multiple-cursors)
+	(use-package multiple-cursors
+	  :config
+	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+
 	(use-package visual-regexp-steroids
 	  :config
 	  (define-key global-map (kbd "C-c r") 'vr/replace)
@@ -953,15 +968,19 @@
 	  ;; if you use multiple-cursors, this is for you:
 	  (define-key global-map (kbd "C-c m") 'vr/mc-mark))
 
-	;; (use-package evil-multiedit
-	;;   :config
-	;;   (evil-multiedit-default-keybinds))
-
 	(use-package evil-multiedit
-	:after evil
-	:config
-	(setq evil-multiedit-follow-matches t))
+	  :after evil
+	  :config
+	  (evil-multiedit-default-keybinds))
+
+	;; (use-package evil-multiedit
+	;; :after evil
+	;; :config
+	;; (setq evil-multiedit-follow-matches t))
   #+end_src
+
+  #+RESULTS:
+  : t
 
 * Hydra
   #+begin_src emacs-lisp
@@ -972,13 +991,13 @@
 	(use-package hydra
 	  :defer 2
 	  :bind ("C-c c" . hydra-clock/body)
-			("C-c z" . hydra-zoom/body)
+			("C-c z" . hydra-mc/body)
 			("C-c r" . 'hydra-launcher/body))
 
 	(defhydra hydra-zoom ()
 	  "zoom"
 	  ("k" text-scale-increase "in")
-	  ("l" text-scale-decrease "out"))
+	  ("j" text-scale-decrease "out"))
 
 	(defhydra hydra-launcher (:color blue)
 	   "Launch"
@@ -1022,6 +1041,10 @@
 
 * Terminal
   #+begin_src emacs-lisp
+	(use-package direnv
+	  :config
+	  (direnv-mode))
+
 	(use-package term
 	  :config
 	  (setq explicit-shell-file-name "bash")
@@ -1037,7 +1060,7 @@
 	  (interactive)
 	  (when vterm--process
 		(let* ((pid (process-id vterm--process))
-			   (dir (file-truename (format "/proc/%d/cwd/" pid))))
+				(dir (file-truename (format "/proc/%d/cwd/" pid))))
 		  (setq default-directory dir))))
 
 	(use-package vterm
@@ -1047,7 +1070,42 @@
 	  ;;(setq vterm-shell "zsh")
 	  (setq vterm-max-scrollback 10000))
 
-	;(advice-add :before #'find-file #'vterm-directory-sync)
+	(use-package multi-vterm
+	  :config
+	  (add-hook 'vterm-mode-hook
+		(lambda ()
+		  ;(setq-local evil-insert-state-cursor 'box)
+		  (evil-insert-state)))
+	  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+
+	  (setq vterm-keymap-exceptions nil)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+	  (evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+	  (evil-define-key 'normal vterm-mode-map (kbd ",c")       #'multi-vterm)
+	  (evil-define-key 'normal vterm-mode-map (kbd ",n")       #'multi-vterm-next)
+	  (evil-define-key 'normal vterm-mode-map (kbd ",p")       #'multi-vterm-prev)
+	  (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
+	  (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
+	  (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
+
+											;(advice-add :before #'find-file #'vterm-directory-sync)
 
 	(defun vterm-find-file ()
 	  "Start vterm-directory-sync before find-file"
@@ -1156,7 +1214,7 @@
 	   )
    #+end_src
 
-** LSP
+** LSP [Disabled]
    #+begin_src emacs-lisp
 	 ;; (use-package lsp-mode
 	 ;;   :commands (lsp lsp-deffered)
@@ -1186,6 +1244,27 @@
 	 ;; ;; LSP debugger
 	 ;; (use-package dap-mode)
 	 ;; (use-package dap-haskell) ; to load the dap adapter for haskell
+   #+end_src
+
+** Lisp
+   #+begin_src emacs-lisp
+	 ;; (use-package slime
+	 ;; 	:config
+	 ;; 	(setq inferior-lisp-program "sbcl"))
+
+	 ;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+	 (use-package sly
+	   :config
+	   (setq inferior-lisp-program "sbcl")
+	   ;; (add-hook 'sly-mode-hook 'set-up-sly-ac)
+	   ;; (eval-after-load 'auto-complete
+	   ;;   '(add-to-list 'ac-modes 'sly-mrepl-mode))
+	   (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+	   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+	   (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+	   (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+	   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+	   (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
    #+end_src
 
 ** Hindent
@@ -1243,12 +1322,9 @@
 *** J
 	#+begin_src emacs-lisp
 	  (use-package j-mode
-		:defer t)
-
-	(use-package j-mode
-	:defer t
-	:init
-	(setq j-console-cmd "jconsole"))
+	     :defer t
+	     :init
+	     (setq j-console-cmd "jconsole"))
 	#+end_src
 *** Nix
 	#+begin_src emacs-lisp
@@ -1260,7 +1336,7 @@
 	  (use-package cmake-mode
 		:defer t)
 	#+end_src
-*** Lisp
+*** APL
 	#+begin_src emacs-lisp
 	  (defun em-gnu-apl-init ()
 	    (setq buffer-face-mode-face 'gnu-apl-default)
