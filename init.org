@@ -184,6 +184,46 @@
 	;;       scroll-margin 99999)
   #+end_src
 
+* Basic Packages
+  #+begin_src emacs-lisp
+	(use-package hl-line
+	  :config
+	  (global-hl-line-mode 1))
+	; (set-face-attribute 'hl-line nil :background "gray21"))
+
+	(use-package restart-emacs
+	  :defer t)
+
+	;; Allows you to "try" a package without installing it
+	(use-package try
+	  :defer t)
+
+	;; Power of Emacs' powerful undo system more intuitivily. Inspired by VIM
+	(use-package undo-tree
+	  :config
+	  (global-undo-tree-mode))
+
+	(use-package command-log-mode        ; See which commands are run and the output of them in a side window
+	  :defer t
+	  :diminish                          ; Removes command-log showing up in modeline
+	  :config
+	  (global-command-log-mode))
+
+	(use-package pcre2el
+	  :config
+	  (pcre-mode 0))
+
+	;; Jump around very conveniently
+	(use-package avy)
+
+	;; Search with regexp and others
+	(use-package anzu
+	  :defer t)
+
+	(use-package ranger
+	  :defer t)
+ #+end_src
+
 * Indenting
   #+begin_src emacs-lisp
 	;; Create a variable for our preferred tab width
@@ -243,50 +283,10 @@
 	(setq whitespace-style '(face trailing))
 
 	;; for tabs AND spaces at the same time
-	;; (use-package smart-tabs-mode
-	;;   :config
-	;;   (setq evil-indent-convert-tabs nil))
+	(use-package smart-tabs-mode
+	  :config
+	  (setq evil-indent-convert-tabs nil))
   #+end_src
-
-* Basic Packages
-  #+begin_src emacs-lisp
-	(use-package hl-line
-	  :config
-	  (global-hl-line-mode 1))
-	; (set-face-attribute 'hl-line nil :background "gray21"))
-
-	(use-package restart-emacs
-	  :defer t)
-
-	;; Allows you to "try" a package without installing it
-	(use-package try
-	  :defer t)
-
-	;; Power of Emacs' powerful undo system more intuitivily. Inspired by VIM
-	(use-package undo-tree
-	  :config
-	  (global-undo-tree-mode))
-
-	(use-package command-log-mode        ; See which commands are run and the output of them in a side window
-	  :defer t
-	  :diminish                          ; Removes command-log showing up in modeline
-	  :config
-	  (global-command-log-mode))
-
-	(use-package pcre2el
-	  :config
-	  (pcre-mode 0))
-
-	;; Jump around very conveniently
-	(use-package avy)
-
-	;; Search with regexp and others
-	(use-package anzu
-	  :defer t)
-
-	(use-package ranger
-	  :defer t)
- #+end_src
 
 * Theme
   #+begin_src emacs-lisp
@@ -338,80 +338,330 @@
 	;; (use-package helm-dash)
   #+end_src
 
-* Ivy
+* Ivy [Disabled]
   #+begin_src emacs-lisp
-	(use-package ivy
-	  :diminish
-	  :bind (("C-s" . swiper)
-		 :map ivy-minibuffer-map
-		 ("TAB" . ivy-alt-done)
-		 ("C-l" . ivy-alt-done)
-		 ("C-j" . ivy-next-line)
-		 ("C-k" . ivy-previous-line)
-		 :map ivy-switch-buffer-map
-		 ("C-k" . ivy-previous-line)
-		 ("C-l" . ivy-done)
-		 ("C-d" . ivy-switch-buffer-kill)
-		 :map ivy-reverse-i-search-map
-		 ("C-k" . ivy-previous-line)
-		 ("C-d" . ivy-reverse-i-search-kill))
+	;; (use-package ivy
+	;;   :diminish
+	;;   :bind (("C-s" . swiper)
+	;; 	 :map ivy-minibuffer-map
+	;; 	 ("TAB" . ivy-alt-done)
+	;; 	 ("C-l" . ivy-alt-done)
+	;; 	 ("C-j" . ivy-next-line)
+	;; 	 ("C-k" . ivy-previous-line)
+	;; 	 :map ivy-switch-buffer-map
+	;; 	 ("C-k" . ivy-previous-line)
+	;; 	 ("C-l" . ivy-done)
+	;; 	 ("C-d" . ivy-switch-buffer-kill)
+	;; 	 :map ivy-reverse-i-search-map
+	;; 	 ("C-k" . ivy-previous-line)
+	;; 	 ("C-d" . ivy-reverse-i-search-kill))
+	;;   :config
+	;;   (ivy-mode 1)
+	;;  '(ivy-initial-inputs-alist nil)
+	;;   (setq ivy-re-builders-alist
+	;; 	  '((ivy-switch-buffer . ivy--regex-plus)
+	;; 		(swiper . ivy--regex-plus)
+	;; 		(t . ivy--regex-plus)))) ;; you could use ivy--regex-fuzzy for ULTIMATE Matching
+	;; 								 ;; but it is too much for me
+
+	;; ;; Sorts latest commands (faster than smex) to the top
+	;; (use-package ivy-prescient
+	;; 	:config
+	;; 	(ivy-prescient-mode 1))
+
+	;; ;; Fuzzy Sort Ivy
+	;; (use-package flx)
+
+	;; ;; Shows description and keybinding of function
+	;; ;; also colors modes that are on and other tweaks
+	;; (use-package ivy-rich
+	;; 	:init
+	;; 	(ivy-rich-mode 1))
+
+	;; ;; Persist history over Emacs restarts
+	;; (use-package savehist
+	;;   :init
+	;;   (savehist-mode))
+
+	;; ;; Pop up windows for evil-owl and the such
+	;; (use-package ivy-posframe)
+  #+end_src
+
+* Counsel [Disabled]
+  #+begin_src emacs-lisp
+	;; (use-package counsel
+	;;   :bind (("M-x" . counsel-M-x)))
+  #+end_src
+
+* Vertico
+  #+begin_src emacs-lisp
+	(use-package vertico
+	  :init
+	  (vertico-mode)
+	  (setq vertico-cycle t)
+	  (setq vertico-resize nil)
+	  :bind (:map vertico-map
+			  ("C-j" . vertico-next)
+			  ("C-k" . vertico-previous)
+			  ("C-d" . vertico-scroll-down)
+			  ("C-u" . vertico-scroll-up) ())
 	  :config
-	  (ivy-mode 1)
-	 '(ivy-initial-inputs-alist nil)
-	  (setq ivy-re-builders-alist
-		  '((ivy-switch-buffer . ivy--regex-plus)
-			(swiper . ivy--regex-plus)
-			(t . ivy--regex-plus)))) ;; you could use ivy--regex-fuzzy for ULTIMATE Matching
-									 ;; but it is too much for me
+	  (setq completion-styles '(substring orderless)
+		read-file-name-completion-ignore-case t ;; Ignore Case w/ files
+		read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
 
-	;; Sorts latest commands (faster than smex) to the top
-	(use-package ivy-prescient
-		:config
-		(ivy-prescient-mode 1))
+	;; Optionally use the `orderless' completion style. See
+	;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
+	;; dispatcher. Additionally enable `partial-completion' for file path
+	;; expansion. `partial-completion' is important for wildcard support.
+	;; Multiple files can be opened at once with `find-file' if you enter a
+	;; wildcard. You may also give the `initials' completion style a try.
+	(use-package orderless
+	  :init
+	  ;; Configure a custom style dispatcher (see the Consult wiki)
+	  ;; (setq orderless-style-dispatchers '(+orderless-dispatch))
+	  (setq completion-styles '(substring orderless)
+			completion-category-defaults nil
+			completion-category-overrides '((file (styles partial-completion)))))
 
-	;; Fuzzy Sort Ivy
-	(use-package flx)
-
-	;; Shows description and keybinding of function
-	;; also colors modes that are on and other tweaks
-	(use-package ivy-rich
-		:init
-		(ivy-rich-mode 1))
-
-	;; Persist history over Emacs restarts
+	;; Persist history over Emacs restarts. Vertico sorts by history position.
 	(use-package savehist
 	  :init
 	  (savehist-mode))
 
-	;; Pop up windows for evil-owl and the such
-	(use-package ivy-posframe)
+	(use-package emacs
+	  :init
+	  ;; Add prompt indicator to `completing-read-multiple'.
+	  ;; Alternatively try `consult-completing-read-multiple'.
+	  (defun crm-indicator (args)
+		(cons (concat "[CRM] " (car args)) (cdr args)))
+	  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+	  ;; Do not allow the cursor in the minibuffer prompt
+	  (setq minibuffer-prompt-properties
+		'(read-only t cursor-intangible t face minibuffer-prompt))
+	  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+	  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+	  ;; Vertico commands are hidden in normal buffers.
+	  ;; (setq read-extended-command-predicate
+	  ;;       #'command-completion-default-include-p)
+
+	  ;; Enable recursive minibuffers
+	  (setq enable-recursive-minibuffers t))
   #+end_src
 
-* Counsel
+* Consult
   #+begin_src emacs-lisp
-	(use-package counsel
-	  :bind (("M-x" . counsel-M-x)))
+	;; Example configuration for Consult
+	(use-package consult
+	  ;; Replace bindings. Lazily loaded due by `use-package'.
+	  :bind (;; C-c bindings (mode-specific-map)
+			 ("C-c h" . consult-history)
+			 ("C-c m" . consult-mode-command)
+			 ("C-c b" . consult-bookmark)
+			 ("C-c k" . consult-kmacro)
+			 ;; C-x bindings (ctl-x-map)
+			 ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+			 ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+			 ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+			 ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+			 ;; Custom M-# bindings for fast register access
+			 ("M-#" . consult-register-load)
+			 ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+			 ("C-M-#" . consult-register)
+			 ;; Other custom bindings
+			 ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+			 ("<help> a" . consult-apropos)            ;; orig. apropos-command
+			 ;; M-g bindings (goto-map)
+			 ("M-g e" . consult-compile-error)
+			 ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+			 ("M-g g" . consult-goto-line)             ;; orig. goto-line
+			 ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+			 ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+			 ("M-g m" . consult-mark)
+			 ("M-g k" . consult-global-mark)
+			 ("M-g i" . consult-imenu)
+			 ("M-g I" . consult-imenu-multi)
+			 ;; M-s bindings (search-map)
+			 ("M-s f" . consult-find)
+			 ("M-s F" . consult-locate)
+			 ("M-s g" . consult-grep)
+			 ("M-s G" . consult-git-grep)
+			 ("M-s r" . consult-ripgrep)
+			 ("M-s l" . consult-line)
+			 ("M-s L" . consult-line-multi)
+			 ("M-s m" . consult-multi-occur)
+			 ("M-s k" . consult-keep-lines)
+			 ("M-s u" . consult-focus-lines)
+			 ;; Isearch integration
+			 ("M-s e" . consult-isearch)
+			 :map isearch-mode-map
+			 ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+			 ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+			 ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+			 ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
+
+	  ;; Enable automatic preview at point in the *Completions* buffer.
+	  ;; This is relevant when you use the default completion UI,
+	  ;; and not necessary for Vertico, Selectrum, etc.
+	  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+	  ;; The :init configuration is always executed (Not lazy)
+	  :init
+
+	  ;; Optionally configure the register formatting. This improves the register
+	  ;; preview for `consult-register', `consult-register-load',
+	  ;; `consult-register-store' and the Emacs built-ins.
+	  (setq register-preview-delay 0
+			register-preview-function #'consult-register-format)
+
+	  ;; Optionally tweak the register preview window.
+	  ;; This adds thin lines, sorting and hides the mode line of the window.
+	  (advice-add #'register-preview :override #'consult-register-window)
+
+	  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+	  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+	  ;; Use Consult to select xref locations with preview
+	  (setq xref-show-xrefs-function #'consult-xref
+			xref-show-definitions-function #'consult-xref)
+
+	  ;; Configure other variables and modes in the :config section,
+	  ;; after lazily loading the package.
+	  :config
+
+	  ;; Optionally configure preview. The default value
+	  ;; is 'any, such that any key triggers the preview.
+	  ;; (setq consult-preview-key 'any)
+	  ;; (setq consult-preview-key (kbd "M-."))
+	  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+	  ;; For some commands and buffer sources it is useful to configure the
+	  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+	  (consult-customize
+	   consult-theme
+	   :preview-key '(:debounce 0.2 any)
+	   consult-ripgrep consult-git-grep consult-grep
+	   consult-bookmark consult-recent-file consult-xref
+	   consult--source-file consult--source-project-file consult--source-bookmark
+	   :preview-key (kbd "M-."))
+
+	  ;; Optionally configure the narrowing key.
+	  ;; Both < and C-+ work reasonably well.
+	  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+	  ;; Optionally make narrowing help available in the minibuffer.
+	  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+	  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+	  ;; Optionally configure a function which returns the project root directory.
+	  ;; There are multiple reasonable alternatives to chose from.
+	  ;;;; 1. project.el (project-roots)
+	  (setq consult-project-root-function
+			(lambda ()
+			  (when-let (project (project-current))
+				(car (project-roots project)))))
+	  ;;;; 2. projectile.el (projectile-project-root)
+	  ;; (autoload 'projectile-project-root "projectile")
+	  ;; (setq consult-project-root-function #'projectile-project-root)
+	  ;;;; 3. vc.el (vc-root-dir)
+	  ;; (setq consult-project-root-function #'vc-root-dir)
+	  ;;;; 4. locate-dominating-file
+	  ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+	)
+  #+end_src
+
+* Embark
+  #+begin_src emacs-lisp
+	(use-package marginalia
+	  :config
+	  (marginalia-mode))
+
+	(use-package embark
+	  :bind
+	  (("C-." . embark-act)         ;; pick some comfortable binding
+	   ("C-," . embark-export)
+	   ("C-;" . embark-dwim)        ;; good alternative: M-.
+	   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+	  :init
+	  ;; Optionally replace the key help with a completing-read interface
+	  (setq prefix-help-command #'embark-prefix-help-command)
+
+	  :config
+	  ;; Hide the mode line of the Embark live/completions buffers
+	  (add-to-list 'display-buffer-alist
+				   '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+					 nil
+					 (window-parameters (mode-line-format . none)))))
+
+	;; Consult users will also want the embark-consult package.
+	(use-package embark-consult
+	  :after (embark consult)
+	  :demand t ; only necessary if you have the hook below
+	  ;; if you want to have consult previews as you move around an
+	  ;; auto-updating embark collect buffer
+	  :hook
+	  (embark-collect-mode . consult-preview-at-point-mode))
+  #+end_src
+
+* Corfu
+  #+begin_src emacs-lisp
+	(use-package corfu
+	  ;; Optional customizations
+	  :custom
+	  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+	  (corfu-auto t)                 ;; Enable auto completion
+	  ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
+	  ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+	  ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+	  ;; (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
+
+	  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+	  :bind (:map corfu-map
+			 ("C-j" . corfu-next)
+			 ("TAB" . corfu-next)
+			 ([tab] . corfu-next)
+			 ("C-k" . corfu-previous)
+			 ("S-TAB" . corfu-previous)
+			 ([backtab] . corfu-previous))
+
+	  ;; You may want to enable Corfu only for certain modes.
+	  ;; :hook ((prog-mode . corfu-mode)
+	  ;;        (shell-mode . corfu-mode)
+	  ;;        (eshell-mode . corfu-mode))
+
+	  ;; Recommended: Enable Corfu globally.
+	  ;; This is recommended since dabbrev can be used globally (M-/).
+	  :init
+	  (corfu-global-mode))
+
+	;; Dabbrev works with Corfu
+	(use-package dabbrev
+	  ;; Swap M-/ and C-M-/
+	  :bind (("M-/" . dabbrev-completion)
+			 ("C-M-/" . dabbrev-expand)))
+
+	;; A few more useful configurations...
+	(use-package emacs
+	  :init
+	  ;; TAB cycle if there are only few candidates
+	  (setq completion-cycle-threshold 3)
+
+	  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+	  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+	  ;; (setq read-extended-command-predicate
+	  ;;       #'command-completion-default-include-p)
+
+	  ;; Enable indentation+completion using the TAB key.
+	  ;; `completion-at-point' is often bound to M-TAB.
+	  (setq tab-always-indent 'complete))
   #+end_src
 
 * Modeline
   #+begin_src emacs-lisp
 	(use-package doom-modeline
 	  :init (doom-modeline-mode 1))
-
-	;; (use-package telephone-line
-	;;   :init
-	;;     (setq telephone-line-lhs
-	;;         '((evil   . (telephone-line-evil-tag-segment))
-	;;             (accent . (telephone-line-vc-segment
-	;;                     telephone-line-erc-modified-channels-segment
-	;;                     telephone-line-process-segment))
-	;;             (nil    . (telephone-line-minor-mode-segment
-	;;                     telephone-line-buffer-segment))))
-	;;     (setq telephone-line-rhs
-	;;         '((nil    . (telephone-line-misc-info-segment))
-	;;             (accent . (telephone-line-major-mode-segment))
-	;;             (evil   . (telephone-line-airline-position-segment))))
-	;;     (telephone-line-mode 1))
 
     ;; IMPORTANT: RUN THIS AT FIRST INSTALL
 	;; Installs all fonts for the doom-modeline
@@ -463,6 +713,15 @@
   #+begin_src emacs-lisp
 	(use-package magit
 	  :defer t)
+  #+end_src
+
+* English
+  #+begin_src emacs-lisp
+	(use-package flyspell-popup
+	  :defer t
+	  :config
+	  (define-key flyspell-mode-map (kbd "C-;") #'flyspell-popup-correct)
+	  (add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode))
   #+end_src
 
 * Org Mode
@@ -629,9 +888,11 @@
 	;; Which key helps find commands by popping a panel
 	(use-package which-key
 	  :init (which-key-mode)
+	  :after-init
+	  (setq which-key-idle-delay 0.2)
 	  :diminish which-key-mode
 	  :config
-	  (setq which-key-idle-delay 0.3)) ; delay before popping up the which-key panel
+	  (setq which-key-idle-delay 0.2)) ; delay before popping up the which-key panel
 
 	;; (use-package which-key-posframe)
   #+end_src
@@ -640,14 +901,15 @@
   #+begin_src emacs-lisp
 	(use-package helpful
 	  :defer t
-	  :custom
-	  (counsel-describe-function-function #'helpful-callable)
-	  (counsel-describe-variable-function #'helpful-variable)
-	  :bind
-	  ([remap describe-function] . counsel-describe-function)
-	  ([remap describe-command] . helpful-command)
-	  ([remap describe-variable] . counsel-describe-variable)
-	  ([remap describe-key] . helpful-key))
+	  ;; :custom
+	  ;; (counsel-describe-function-function #'helpful-callable)
+	  ;; (counsel-describe-variable-function #'helpful-variable)
+	  ;; :bind
+	  ;; ([remap describe-function] . counsel-describe-function)
+	  ;; ([remap describe-command] . helpful-command)
+	  ;; ([remap describe-variable] . counsel-describe-variable)
+	  ;; ([remap describe-key] . helpful-key)
+	)
   #+end_src
 
 * Keyboard Input
@@ -780,33 +1042,33 @@
 		(global-evil-mc-mode t))
 	#+end_src
 
-*** Owl
+*** Owl [Disabled]
 	#+begin_src emacs-lisp
 	  ;; Pops up a window and allows you to view registers and marks before using them.
-	  (use-package evil-owl
-		:config
-		(setq evil-owl-display-method 'posframe
-			  evil-owl-extra-posframe-args '(:width 50 :height 20)
-			  evil-owl-max-string-length 50)
-
-		(defun mpereira/update-evil-owl-posframe-args ()
-			(interactive)
-			(setq evil-owl-extra-posframe-args
-				`(:width 80
-					:height 20
-					:background-color ,(face-attribute 'ivy-posframe :background nil t)
-					:foreground-color ,(face-attribute 'ivy-posframe :foreground nil t)
-					:internal-border-width ,ivy-posframe-border-width
-					:internal-border-color ,(face-attribute 'ivy-posframe-border
-															:background
-															nil
-															t))))
-
-		;; This needs to run after the initial theme load.
-		(add-hook 'after-init-hook 'mpereira/update-evil-owl-posframe-args 'append)
-		(add-hook 'after-load-theme-hook 'mpereira/update-evil-owl-posframe-args)
-
-		(evil-owl-mode))
+	  ;; (use-package evil-owl
+;;		:config
+;;		(setq evil-owl-display-method 'posframe
+;;			  evil-owl-extra-posframe-args '(:width 50 :height 20)
+;;			  evil-owl-max-string-length 50)
+;;
+;;		(defun mpereira/update-evil-owl-posframe-args ()
+;;			(interactive)
+;;			(setq evil-owl-extra-posframe-args
+;;				`(:width 80
+;;					:height 20
+;;					:background-color ,(face-attribute 'ivy-posframe :background nil t)
+;;					:foreground-color ,(face-attribute 'ivy-posframe :foreground nil t)
+;;					:internal-border-width ,ivy-posframe-border-width
+;;					:internal-border-color ,(face-attribute 'ivy-posframe-border
+;;															:background
+;;															nil
+;;															t))))
+;;
+;;		;; This needs to run after the initial theme load.
+;;		(add-hook 'after-init-hook 'mpereira/update-evil-owl-posframe-args 'append)
+;;		(add-hook 'after-load-theme-hook 'mpereira/update-evil-owl-posframe-args)
+;;
+;;		(evil-owl-mode))
 	#+end_src
 
 *** Nerd Commenter
@@ -1041,6 +1303,7 @@
 
 * Terminal
   #+begin_src emacs-lisp
+	;; For Nix, direnv, .envrc and lorri
 	(use-package direnv
 	  :config
 	  (direnv-mode))
@@ -1107,11 +1370,11 @@
 
 											;(advice-add :before #'find-file #'vterm-directory-sync)
 
-	(defun vterm-find-file ()
-	  "Start vterm-directory-sync before find-file"
-	  (interactive)
-	  (vterm-directory-sync)
-	  (counsel-find-file))
+	;; (defun vterm-find-file ()
+	;;   "Start vterm-directory-sync before find-file"
+	;;   (interactive)
+	;;   (vterm-directory-sync)
+	;;   (counsel-find-file))
   #+end_src
 
 * Tex
@@ -1156,8 +1419,8 @@
 	  (add-hook 'flyspell-mode-hook (lambda ()
 									  (auto-dictionary-mode 1))))
 
-	(use-package company-auctex
-	  :init (company-auctex-init))
+	;; (use-package company-auctex
+	;;   :init (company-auctex-init))
 
 	(use-package tex
 	  :ensure auctex
@@ -1433,6 +1696,7 @@
 	  ;;   (add-hook 'c-mode-common-hook 'google-set-c-style)
 	  ;;   (add-hook 'c-mode-common-hook 'google-make-newline-indent))
          #+end_src
+
 * Images
   #+begin_src emacs-lisp
     (use-package eimp
@@ -1626,129 +1890,134 @@
 
 * Keybindings
   #+begin_src emacs-lisp
-    (global-set-key (kbd "M-j") 'hamza/insert-line-below)
-    (global-set-key (kbd "M-k") 'hamza/insert-line-above)
-    (global-set-key (kbd "M-C-j") 'hamza/remove-line-below)
-    (global-set-key (kbd "M-C-k") 'hamza/remove-line-above)
+	(global-set-key (kbd "M-j") 'hamza/insert-line-below)
+	(global-set-key (kbd "M-k") 'hamza/insert-line-above)
+	(global-set-key (kbd "M-C-j") 'hamza/remove-line-below)
+	(global-set-key (kbd "M-C-k") 'hamza/remove-line-above)
 
-    (use-package general
-      :config
-      ;; (general-define-key
-      ;;  :states '(normal visual)
-      ;;  :keymaps 'override ;; override any existing keybindings
+	;; Will make it a lot less annoying to use Evil in the minibuffer and in M-x
+    ;; Removing "insert-digraph" and unbinding C-k in insert-mode
+	(eval-after-load "evil-maps"
+	  (define-key evil-insert-state-map "\C-k" nil))
 
-      ;;  ""
+	(use-package general
+	  :config
+	  ;; (general-define-key
+	  ;;  :states '(normal visual)
+	  ;;  :keymaps 'override ;; override any existing keybindings
 
-      (general-define-key
-       :states '(normal visual insert emacs)
-       :keymaps 'override ;; override any existing keybindings
-       :prefix "SPC"
-       :non-normal-prefix "C-SPC"
+	  ;;  ""
 
-       ;;; General ;)
-       "SPC" '(vterm-find-file :which-key "Find File")
-       "s" '(save-buffer :which-key "Save Buffer")
+	  (general-define-key
+	   :states '(normal visual insert emacs)
+	   :keymaps 'override ;; override any existing keybindings
+	   :prefix "SPC"
+	   :non-normal-prefix "C-SPC"
 
-       ;;; Files
-       "f" '(:ignore t :which-key "Files")
-       "ff" '(find-file :which-key "Find File")
-       "ft" '((lambda () (interactive)(find-file "~/wrk/todo.org")) :which-key "Todo")
-       ;; Dev
-       "fd" '(:ignore t :which-key "Development")
-       "fdd" '((lambda () (interactive)(find-file "~/dev")) :which-key "Development")
-       "fdj" '((lambda () (interactive)(find-file "~/dev/java")) :which-key "Java")
-       "fdc" '((lambda () (interactive)(find-file "~/dev/cpp")) :which-key "C++")
-       "fdh" '((lambda () (interactive)(find-file "~/dev/haskell")) :which-key "Haskell")
-       ;; Dev/Learning
-       "fdl" '(:ignore t :which-key "Learning")
-       "fdld" '((lambda () (interactive)(find-file "~/dev/learning")) :which-key "Learning")
-       "fdlj" '((lambda () (interactive)(find-file "~/dev/learning/java")) :which-key "Java")
-       "fdlc" '((lambda () (interactive)(find-file "~/dev/learning/cpp")) :which-key "C++")
-       "fdlh" '((lambda () (interactive)(find-file "~/dev/learning/haskell")) :which-key "Haskell")
-       ;; Education
-       "fe" '(:ignore t :which-key "Education")
-       "fec" '(:ignore t :which-key "Computer Science")
-       "fecn" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/notes/notes.org")) :which-key "Notes")
-       "fecp" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/pp/")) :which-key "Past Papers")
-       "fep" '(:ignore t :which-key "Physics")
-       "fepn" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/notes.org")) :which-key "Notes")
-       "fepk" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/khanacademy-notes.org")) :which-key "Khan Academy Notes")
-       "fepp" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/pp/")) :which-key "Past Papers")
-       "fem" '(:ignore t :which-key "Maths")
-       "femn" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/notes/notes.org")) :which-key "Notes")
-       "femp" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/pp/")) :which-key "Past Papers")
-       "fei" '(:ignore t :which-key "Islamiyat")
-       "fein" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/notes/notes.org")) :which-key "Islamiyat")
-       "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
-       ;; Config Files
-       "fc" '(:ignore t :which-key "Configuration Files")
-       "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
-       "fcw" '(:ignore t :which-key "WM Config Files")
-       "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
-       "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
+	   ;;; General ;)
+	   "SPC" '(vterm-find-file :which-key "Find File")
+	   "s" '(save-buffer :which-key "Save Buffer")
 
-       ;;; Code
-       "c" '(:ignore t :which-key "Code")
-       "cc" '(compile :which-key "Compile")
-       "ce" '(eshell-command :which-key "Run a Command in Eshell")
-       "cs" '(eval-last-sexp :which-key "Run Elisp Code before Point")
+	   ;;; Files
+	   "f" '(:ignore t :which-key "Files")
+	   "ff" '(find-file :which-key "Find File")
+	   "ft" '((lambda () (interactive)(find-file "~/wrk/todo.org")) :which-key "Todo")
+	   ;; Dev
+	   "fd" '(:ignore t :which-key "Development")
+	   "fdd" '((lambda () (interactive)(find-file "~/dev")) :which-key "Development")
+	   "fdj" '((lambda () (interactive)(find-file "~/dev/java")) :which-key "Java")
+	   "fdc" '((lambda () (interactive)(find-file "~/dev/cpp")) :which-key "C++")
+	   "fdh" '((lambda () (interactive)(find-file "~/dev/haskell")) :which-key "Haskell")
+	   ;; Dev/Learning
+	   "fdl" '(:ignore t :which-key "Learning")
+	   "fdld" '((lambda () (interactive)(find-file "~/dev/learning")) :which-key "Learning")
+	   "fdlj" '((lambda () (interactive)(find-file "~/dev/learning/java")) :which-key "Java")
+	   "fdlc" '((lambda () (interactive)(find-file "~/dev/learning/cpp")) :which-key "C++")
+	   "fdlh" '((lambda () (interactive)(find-file "~/dev/learning/haskell")) :which-key "Haskell")
+	   ;; Education
+	   "fe" '(:ignore t :which-key "Education")
+	   "fec" '(:ignore t :which-key "Computer Science")
+	   "fecn" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/notes/notes.org")) :which-key "Notes")
+	   "fecp" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/pp/")) :which-key "Past Papers")
+	   "fep" '(:ignore t :which-key "Physics")
+	   "fepn" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/notes.org")) :which-key "Notes")
+	   "fepk" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/khanacademy-notes.org")) :which-key "Khan Academy Notes")
+	   "fepp" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/pp/")) :which-key "Past Papers")
+	   "fem" '(:ignore t :which-key "Maths")
+	   "femn" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/notes/notes.org")) :which-key "Notes")
+	   "femp" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/pp/")) :which-key "Past Papers")
+	   "fei" '(:ignore t :which-key "Islamiyat")
+	   "fein" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/notes/notes.org")) :which-key "Islamiyat")
+	   "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
+	   ;; Config Files
+	   "fc" '(:ignore t :which-key "Configuration Files")
+	   "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
+	   "fcw" '(:ignore t :which-key "WM Config Files")
+	   "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
+	   "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
 
-       ;;; Applications
-       "a" '(:ignore t :which-key "Applications")
-       "ad" '(dired :which-key "Dired")
-       "ae" '(eshell :which-key "Eshell")
-       "ar" '(ranger :which-key "Ranger")
-       "av" '(vterm :which-key "Vterm")
+	   ;;; Code
+	   "c" '(:ignore t :which-key "Code")
+	   "cc" '(compile :which-key "Compile")
+	   "ce" '(eshell-command :which-key "Run a Command in Eshell")
+	   "cs" '(eval-last-sexp :which-key "Run Elisp Code before Point")
 
-       ;;; Buffers
-       "b" '(:ignore t :which-key "Buffers")
-       "bb" '(switch-to-buffer :which-key "Switch to Buffer")
-       "bB" '(ibuffer :which-key "ibuffer")
-       "bk" '(kill-current-buffer :which-key "Kill Buffer")
-       "br" '(revert-buffer :which-key "Revert Buffer")
+	   ;;; Applications
+	   "a" '(:ignore t :which-key "Applications")
+	   "ad" '(dired :which-key "Dired")
+	   "ae" '(eshell :which-key "Eshell")
+	   "ar" '(ranger :which-key "Ranger")
+	   "av" '(vterm :which-key "Vterm")
 
-       ;;; Toggle
-       "t" '(:ignore t :which-key "Toggle")
-       "tf" '(flyspell-mode :which-key "Flyspell")
-       "tt" '(treemacs :which-key "Treemacs")
-       "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
-       "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
-       "tg" '(evil-goggles-mode :which-key "Evil Goggles")
-       "ts" '(:ignore t :which-key "Smartparens")
-       "tst" '(smartparens-mode :which-key "Smartparens Mode")
-       "tss" '(smartparens-strict-mode :which-key "Strict Mode")
+	   ;;; Buffers
+	   "b" '(:ignore t :which-key "Buffers")
+	   "bb" '(switch-to-buffer :which-key "Switch to Buffer")
+	   "bB" '(ibuffer :which-key "ibuffer")
+	   "bk" '(kill-current-buffer :which-key "Kill Buffer")
+	   "br" '(revert-buffer :which-key "Revert Buffer")
 
-       ;;; Org Mode
-       "o" '(:ignore t :which-key "Org")
-       "oj" '(org-insert-subheading :which-key "Insert Subheading")
-       "oJ" '(org-insert-heading :which-key "Insert Heading")
-       "ow" '(org-todo :which-key "Org Todo") ;; w for work... I don't know man.
-       ;; Headings
-       "oh" '(:ignore t :which-key "Headings")
-       "ohs" '(:ignore t :which-key "Subheading")
-       "ohst" '(org-insert-todo-subheading :which-key "Todo Subheading")
-       ;; Links
-       "ol" '(:ignore t :which-key "Link")
-       "olf" '(org-open-at-point :which-key "Follow Link")
-       "ols" '(org-store-link :which-key "Store Link")
-       ;; Code / Babel
-       "oc" '(:ignore t :which-key "Code")
-       "ocr" '(hamza/reload-config :which-key "Reload Config")
-       "occ" '(org-babel-execute-src-block :which-key "Compile")
-       "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
-       ;; Org Roam
-       "or" '(:ignore t :which-key "Org Roam")
-       "ori" '(org-roam-insert :which-key "Insert")
-       "orf" '(org-roam-find-file :which-key "Find File")
-       "org" '(org-roam-graph :which-key "Display Graph")
-       "orc" '(org-roam-capture :which-key "Org Capture")
-       ;; Org Tex
-       "ot" '(:ignore t :which-key "TeX/LaTeX")
-       "otp" '(org-latex-preview :which-key "LaTeX Preview")
-       "otb" '(org-beamer-export-to-pdf :which-key "Export Beamer to PDF")
-       "otc" '(org-latex-export-to-pdf :which-key "Export LaTeX to PDF")))
+	   ;;; Toggle
+	   "t" '(:ignore t :which-key "Toggle")
+	   "tf" '(flyspell-mode :which-key "Flyspell")
+	   "tt" '(treemacs :which-key "Treemacs")
+	   "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
+	   "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
+	   "tg" '(evil-goggles-mode :which-key "Evil Goggles")
+	   "ts" '(:ignore t :which-key "Smartparens")
+	   "tst" '(smartparens-mode :which-key "Smartparens Mode")
+	   "tss" '(smartparens-strict-mode :which-key "Strict Mode")
 
-       ;;; TeX
-       ;"t" '(:ignore t :which-key "TeX/LaTeX")
+	   ;;; Org Mode
+	   "o" '(:ignore t :which-key "Org")
+	   "oj" '(org-insert-subheading :which-key "Insert Subheading")
+	   "oJ" '(org-insert-heading :which-key "Insert Heading")
+	   "ow" '(org-todo :which-key "Org Todo") ;; w for work... I don't know man.
+	   ;; Headings
+	   "oh" '(:ignore t :which-key "Headings")
+	   "ohs" '(:ignore t :which-key "Subheading")
+	   "ohst" '(org-insert-todo-subheading :which-key "Todo Subheading")
+	   ;; Links
+	   "ol" '(:ignore t :which-key "Link")
+	   "olf" '(org-open-at-point :which-key "Follow Link")
+	   "ols" '(org-store-link :which-key "Store Link")
+	   ;; Code / Babel
+	   "oc" '(:ignore t :which-key "Code")
+	   "ocr" '(hamza/reload-config :which-key "Reload Config")
+	   "occ" '(org-babel-execute-src-block :which-key "Compile")
+	   "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
+	   ;; Org Roam
+	   "or" '(:ignore t :which-key "Org Roam")
+	   "ori" '(org-roam-insert :which-key "Insert")
+	   "orf" '(org-roam-find-file :which-key "Find File")
+	   "org" '(org-roam-graph :which-key "Display Graph")
+	   "orc" '(org-roam-capture :which-key "Org Capture")
+	   ;; Org Tex
+	   "ot" '(:ignore t :which-key "TeX/LaTeX")
+	   "otp" '(org-latex-preview :which-key "LaTeX Preview")
+	   "otb" '(org-beamer-export-to-pdf :which-key "Export Beamer to PDF")
+	   "otc" '(org-latex-export-to-pdf :which-key "Export LaTeX to PDF")))
+
+	   ;;; TeX
+	   ;"t" '(:ignore t :which-key "TeX/LaTeX")
   #+end_src
 

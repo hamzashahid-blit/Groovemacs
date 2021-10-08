@@ -160,6 +160,43 @@
 ;;       maximum-scroll-margin 0.5
 ;;       scroll-margin 99999)
 
+(use-package hl-line
+  :config
+  (global-hl-line-mode 1))
+; (set-face-attribute 'hl-line nil :background "gray21"))
+
+(use-package restart-emacs
+  :defer t)
+
+;; Allows you to "try" a package without installing it
+(use-package try
+  :defer t)
+
+;; Power of Emacs' powerful undo system more intuitivily. Inspired by VIM
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
+
+(use-package command-log-mode        ; See which commands are run and the output of them in a side window
+  :defer t
+  :diminish                          ; Removes command-log showing up in modeline
+  :config
+  (global-command-log-mode))
+
+(use-package pcre2el
+  :config
+  (pcre-mode 0))
+
+;; Jump around very conveniently
+(use-package avy)
+
+;; Search with regexp and others
+(use-package anzu
+  :defer t)
+
+(use-package ranger
+  :defer t)
+
 ;; Create a variable for our preferred tab width
 (setq custom-tab-width 4)
 (setq custom-tab-width2 2)
@@ -217,46 +254,9 @@
 (setq whitespace-style '(face trailing))
 
 ;; for tabs AND spaces at the same time
-;; (use-package smart-tabs-mode
-;;   :config
-;;   (setq evil-indent-convert-tabs nil))
-
-(use-package hl-line
+(use-package smart-tabs-mode
   :config
-  (global-hl-line-mode 1))
-; (set-face-attribute 'hl-line nil :background "gray21"))
-
-(use-package restart-emacs
-  :defer t)
-
-;; Allows you to "try" a package without installing it
-(use-package try
-  :defer t)
-
-;; Power of Emacs' powerful undo system more intuitivily. Inspired by VIM
-(use-package undo-tree
-  :config
-  (global-undo-tree-mode))
-
-(use-package command-log-mode        ; See which commands are run and the output of them in a side window
-  :defer t
-  :diminish                          ; Removes command-log showing up in modeline
-  :config
-  (global-command-log-mode))
-
-(use-package pcre2el
-  :config
-  (pcre-mode 0))
-
-;; Jump around very conveniently
-(use-package avy)
-
-;; Search with regexp and others
-(use-package anzu
-  :defer t)
-
-(use-package ranger
-  :defer t)
+  (setq evil-indent-convert-tabs nil))
 
 (use-package doom-themes
   :init (load-theme 'doom-gruvbox t))
@@ -299,72 +299,251 @@
 ;; (use-package dash)
 ;; (use-package helm-dash)
 
-(use-package ivy
-  :diminish
-  :bind (("C-s" . swiper)
-	 :map ivy-minibuffer-map
-	 ("TAB" . ivy-alt-done)
-	 ("C-l" . ivy-alt-done)
-	 ("C-j" . ivy-next-line)
-	 ("C-k" . ivy-previous-line)
-	 :map ivy-switch-buffer-map
-	 ("C-k" . ivy-previous-line)
-	 ("C-l" . ivy-done)
-	 ("C-d" . ivy-switch-buffer-kill)
-	 :map ivy-reverse-i-search-map
-	 ("C-k" . ivy-previous-line)
-	 ("C-d" . ivy-reverse-i-search-kill))
-  :config
-  (ivy-mode 1)
- '(ivy-initial-inputs-alist nil)
-  (setq ivy-re-builders-alist
-	  '((ivy-switch-buffer . ivy--regex-plus)
-		(swiper . ivy--regex-plus)
-		(t . ivy--regex-plus)))) ;; you could use ivy--regex-fuzzy for ULTIMATE Matching
-								 ;; but it is too much for me
+;; (use-package ivy
+;;   :diminish
+;;   :bind (("C-s" . swiper)
+;; 	 :map ivy-minibuffer-map
+;; 	 ("TAB" . ivy-alt-done)
+;; 	 ("C-l" . ivy-alt-done)
+;; 	 ("C-j" . ivy-next-line)
+;; 	 ("C-k" . ivy-previous-line)
+;; 	 :map ivy-switch-buffer-map
+;; 	 ("C-k" . ivy-previous-line)
+;; 	 ("C-l" . ivy-done)
+;; 	 ("C-d" . ivy-switch-buffer-kill)
+;; 	 :map ivy-reverse-i-search-map
+;; 	 ("C-k" . ivy-previous-line)
+;; 	 ("C-d" . ivy-reverse-i-search-kill))
+;;   :config
+;;   (ivy-mode 1)
+;;  '(ivy-initial-inputs-alist nil)
+;;   (setq ivy-re-builders-alist
+;; 	  '((ivy-switch-buffer . ivy--regex-plus)
+;; 		(swiper . ivy--regex-plus)
+;; 		(t . ivy--regex-plus)))) ;; you could use ivy--regex-fuzzy for ULTIMATE Matching
+;; 								 ;; but it is too much for me
 
-;; Sorts latest commands (faster than smex) to the top
-(use-package ivy-prescient
-	:config
-	(ivy-prescient-mode 1))
+;; ;; Sorts latest commands (faster than smex) to the top
+;; (use-package ivy-prescient
+;; 	:config
+;; 	(ivy-prescient-mode 1))
 
-;; Fuzzy Sort Ivy
-(use-package flx)
+;; ;; Fuzzy Sort Ivy
+;; (use-package flx)
 
-;; Shows description and keybinding of function
-;; also colors modes that are on and other tweaks
-(use-package ivy-rich
-	:init
-	(ivy-rich-mode 1))
+;; ;; Shows description and keybinding of function
+;; ;; also colors modes that are on and other tweaks
+;; (use-package ivy-rich
+;; 	:init
+;; 	(ivy-rich-mode 1))
 
-;; Persist history over Emacs restarts
+;; ;; Persist history over Emacs restarts
+;; (use-package savehist
+;;   :init
+;;   (savehist-mode))
+
+;; ;; Pop up windows for evil-owl and the such
+;; (use-package ivy-posframe)
+
+;; (use-package counsel
+;;   :bind (("M-x" . counsel-M-x)))
+
+(use-package vertico
+  :init
+  (vertico-mode)
+  (setq vertico-cycle t)
+  (setq vertico-resize nil))
+
+;; Optionally use the `orderless' completion style. See
+;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
+;; dispatcher. Additionally enable `partial-completion' for file path
+;; expansion. `partial-completion' is important for wildcard support.
+;; Multiple files can be opened at once with `find-file' if you enter a
+;; wildcard. You may also give the `initials' completion style a try.
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-dispatch))
+  (setq completion-styles '(orderless)
+		completion-category-defaults nil
+		completion-category-overrides '((file (styles partial-completion)))))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
   :init
   (savehist-mode))
 
-;; Pop up windows for evil-owl and the such
-(use-package ivy-posframe)
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; Alternatively try `consult-completing-read-multiple'.
+  (defun crm-indicator (args)
+	(cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-(use-package counsel
-  :bind (("M-x" . counsel-M-x)))
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+	'(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
+;; Example configuration for Consult
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings (mode-specific-map)
+		 ("C-c h" . consult-history)
+		 ("C-c m" . consult-mode-command)
+		 ("C-c b" . consult-bookmark)
+		 ("C-c k" . consult-kmacro)
+		 ;; C-x bindings (ctl-x-map)
+		 ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+		 ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+		 ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+		 ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+		 ;; Custom M-# bindings for fast register access
+		 ("M-#" . consult-register-load)
+		 ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+		 ("C-M-#" . consult-register)
+		 ;; Other custom bindings
+		 ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+		 ("<help> a" . consult-apropos)            ;; orig. apropos-command
+		 ;; M-g bindings (goto-map)
+		 ("M-g e" . consult-compile-error)
+		 ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+		 ("M-g g" . consult-goto-line)             ;; orig. goto-line
+		 ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+		 ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+		 ("M-g m" . consult-mark)
+		 ("M-g k" . consult-global-mark)
+		 ("M-g i" . consult-imenu)
+		 ("M-g I" . consult-imenu-multi)
+		 ;; M-s bindings (search-map)
+		 ("M-s f" . consult-find)
+		 ("M-s F" . consult-locate)
+		 ("M-s g" . consult-grep)
+		 ("M-s G" . consult-git-grep)
+		 ("M-s r" . consult-ripgrep)
+		 ("M-s l" . consult-line)
+		 ("M-s L" . consult-line-multi)
+		 ("M-s m" . consult-multi-occur)
+		 ("M-s k" . consult-keep-lines)
+		 ("M-s u" . consult-focus-lines)
+		 ;; Isearch integration
+		 ("M-s e" . consult-isearch)
+		 :map isearch-mode-map
+		 ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+		 ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+		 ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+		 ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
+
+  ;; Enable automatic preview at point in the *Completions* buffer.
+  ;; This is relevant when you use the default completion UI,
+  ;; and not necessary for Vertico, Selectrum, etc.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0
+		register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+		xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-file consult--source-project-file consult--source-bookmark
+   :preview-key (kbd "M-."))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; Optionally configure a function which returns the project root directory.
+  ;; There are multiple reasonable alternatives to chose from.
+  ;;;; 1. project.el (project-roots)
+  (setq consult-project-root-function
+		(lambda ()
+		  (when-let (project (project-current))
+			(car (project-roots project)))))
+  ;;;; 2. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-root-function #'projectile-project-root)
+  ;;;; 3. vc.el (vc-root-dir)
+  ;; (setq consult-project-root-function #'vc-root-dir)
+  ;;;; 4. locate-dominating-file
+  ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+)
+
+(use-package marginalia
+  :config
+  (marginalia-mode))
+
+(use-package embark
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-," . embark-export)
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+			   '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+				 nil
+				 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package doom-modeline
       :init (doom-modeline-mode 1))
-
-    ;; (use-package telephone-line
-    ;;   :init
-    ;;     (setq telephone-line-lhs
-    ;;         '((evil   . (telephone-line-evil-tag-segment))
-    ;;             (accent . (telephone-line-vc-segment
-    ;;                     telephone-line-erc-modified-channels-segment
-    ;;                     telephone-line-process-segment))
-    ;;             (nil    . (telephone-line-minor-mode-segment
-    ;;                     telephone-line-buffer-segment))))
-    ;;     (setq telephone-line-rhs
-    ;;         '((nil    . (telephone-line-misc-info-segment))
-    ;;             (accent . (telephone-line-major-mode-segment))
-    ;;             (evil   . (telephone-line-airline-position-segment))))
-    ;;     (telephone-line-mode 1))
 
 ;; IMPORTANT: RUN THIS AT FIRST INSTALL
     ;; Installs all fonts for the doom-modeline
@@ -548,22 +727,25 @@
 ;; Which key helps find commands by popping a panel
 (use-package which-key
   :init (which-key-mode)
+  :after-init
+  (setq which-key-idle-delay 0.2)
   :diminish which-key-mode
   :config
-  (setq which-key-idle-delay 0.3)) ; delay before popping up the which-key panel
+  (setq which-key-idle-delay 0.2)) ; delay before popping up the which-key panel
 
 ;; (use-package which-key-posframe)
 
 (use-package helpful
   :defer t
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+  ;; :custom
+  ;; (counsel-describe-function-function #'helpful-callable)
+  ;; (counsel-describe-variable-function #'helpful-variable)
+  ;; :bind
+  ;; ([remap describe-function] . counsel-describe-function)
+  ;; ([remap describe-command] . helpful-command)
+  ;; ([remap describe-variable] . counsel-describe-variable)
+  ;; ([remap describe-key] . helpful-key)
+)
 
 (use-package evil
   :init
@@ -670,30 +852,30 @@
       (global-evil-mc-mode t))
 
 ;; Pops up a window and allows you to view registers and marks before using them.
-(use-package evil-owl
-      :config
-      (setq evil-owl-display-method 'posframe
-		evil-owl-extra-posframe-args '(:width 50 :height 20)
-		evil-owl-max-string-length 50)
-
-      (defun mpereira/update-evil-owl-posframe-args ()
-	      (interactive)
-	      (setq evil-owl-extra-posframe-args
-		      `(:width 80
-			      :height 20
-			      :background-color ,(face-attribute 'ivy-posframe :background nil t)
-			      :foreground-color ,(face-attribute 'ivy-posframe :foreground nil t)
-			      :internal-border-width ,ivy-posframe-border-width
-			      :internal-border-color ,(face-attribute 'ivy-posframe-border
-													      :background
-													      nil
-													      t))))
-
-      ;; This needs to run after the initial theme load.
-      (add-hook 'after-init-hook 'mpereira/update-evil-owl-posframe-args 'append)
-      (add-hook 'after-load-theme-hook 'mpereira/update-evil-owl-posframe-args)
-
-      (evil-owl-mode))
+	  ;; (use-package evil-owl
+;;		:config
+;;		(setq evil-owl-display-method 'posframe
+;;			  evil-owl-extra-posframe-args '(:width 50 :height 20)
+;;			  evil-owl-max-string-length 50)
+;;
+;;		(defun mpereira/update-evil-owl-posframe-args ()
+;;			(interactive)
+;;			(setq evil-owl-extra-posframe-args
+;;				`(:width 80
+;;					:height 20
+;;					:background-color ,(face-attribute 'ivy-posframe :background nil t)
+;;					:foreground-color ,(face-attribute 'ivy-posframe :foreground nil t)
+;;					:internal-border-width ,ivy-posframe-border-width
+;;					:internal-border-color ,(face-attribute 'ivy-posframe-border
+;;															:background
+;;															nil
+;;															t))))
+;;
+;;		;; This needs to run after the initial theme load.
+;;		(add-hook 'after-init-hook 'mpereira/update-evil-owl-posframe-args 'append)
+;;		(add-hook 'after-load-theme-hook 'mpereira/update-evil-owl-posframe-args)
+;;
+;;		(evil-owl-mode))
 
 ;; comment without selecting and more effecient, does not need evil
 (use-package evil-nerd-commenter
@@ -900,6 +1082,7 @@
 	("o" org-clock-out)
 	("r" org-clock-report))
 
+;; For Nix, direnv, .envrc and lorri
 (use-package direnv
   :config
   (direnv-mode))
@@ -966,11 +1149,11 @@
 
 										;(advice-add :before #'find-file #'vterm-directory-sync)
 
-(defun vterm-find-file ()
-  "Start vterm-directory-sync before find-file"
-  (interactive)
-  (vterm-directory-sync)
-  (counsel-find-file))
+;; (defun vterm-find-file ()
+;;   "Start vterm-directory-sync before find-file"
+;;   (interactive)
+;;   (vterm-directory-sync)
+;;   (counsel-find-file))
 
 
 
@@ -1010,8 +1193,8 @@
   (add-hook 'flyspell-mode-hook (lambda ()
 								  (auto-dictionary-mode 1))))
 
-(use-package company-auctex
-  :init (company-auctex-init))
+;; (use-package company-auctex
+;;   :init (company-auctex-init))
 
 (use-package tex
   :ensure auctex

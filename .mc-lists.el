@@ -19,6 +19,7 @@
       '(
          evil-delete
          evil-force-normal-state
+         evil-org-append-line
          evil-org-delete
          evil-repeat-pop
          evil-search-forward
