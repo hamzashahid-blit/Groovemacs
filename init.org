@@ -410,19 +410,22 @@
 		read-file-name-completion-ignore-case t ;; Ignore Case w/ files
 		read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
 
-	;; Optionally use the `orderless' completion style. See
-	;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
-	;; dispatcher. Additionally enable `partial-completion' for file path
-	;; expansion. `partial-completion' is important for wildcard support.
-	;; Multiple files can be opened at once with `find-file' if you enter a
-	;; wildcard. You may also give the `initials' completion style a try.
+
+	;; Components starting with ! indicate the rest of the component must not occur in the candidate
+	(defun hamza/orderless-without-if-bang (pattern _index _total)
+	  (cond
+	   ((equal "!" pattern)
+		'(orderless-literal . ""))
+	   ((string-prefix-p "!" pattern)
+		`(orderless-without-literal . ,(substring pattern 1)))))
+
 	(use-package orderless
 	  :init
-	  ;; Configure a custom style dispatcher (see the Consult wiki)
-	  ;; (setq orderless-style-dispatchers '(+orderless-dispatch))
 	  (setq completion-styles '(substring orderless)
 			completion-category-defaults nil
-			completion-category-overrides '((file (styles partial-completion)))))
+			completion-category-overrides '((file (styles . '(partial-completion))))
+			orderless-matching-styles '(orderless-flex orderless-literal orderless-regexp)
+			orderless-style-dispatchers '(hamza/orderless-without-if-bang)))
 
 	;; Persist history over Emacs restarts. Vertico sorts by history position.
 	(use-package savehist
@@ -569,6 +572,9 @@
 	  ;;;; 4. locate-dominating-file
 	  ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
 	)
+
+	(use-package embark-consult)
+	(use-package wgrep)
   #+end_src
 
 * Embark

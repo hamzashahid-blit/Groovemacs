@@ -1,4 +1,4 @@
-((("org-babel-tangle" .
-	[1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
-   ("my-org-config-file" .
-	 [0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0])))
+((("my-org-config-file" .
+	[0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0])
+   ("org-babel-tangle" .
+	 [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])))
