@@ -363,19 +363,22 @@
 	read-file-name-completion-ignore-case t ;; Ignore Case w/ files
 	read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
 
-;; Optionally use the `orderless' completion style. See
-;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
-;; dispatcher. Additionally enable `partial-completion' for file path
-;; expansion. `partial-completion' is important for wildcard support.
-;; Multiple files can be opened at once with `find-file' if you enter a
-;; wildcard. You may also give the `initials' completion style a try.
+
+;; Components starting with ! indicate the rest of the component must not occur in the candidate
+(defun hamza/orderless-without-if-bang (pattern _index _total)
+  (cond
+   ((equal "!" pattern)
+	'(orderless-literal . ""))
+   ((string-prefix-p "!" pattern)
+	`(orderless-without-literal . ,(substring pattern 1)))))
+
 (use-package orderless
   :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-dispatch))
   (setq completion-styles '(substring orderless)
 		completion-category-defaults nil
-		completion-category-overrides '((file (styles partial-completion)))))
+		completion-category-overrides '((file (styles . '(partial-completion))))
+		orderless-matching-styles '(orderless-flex orderless-literal orderless-regexp)
+		orderless-style-dispatchers '(hamza/orderless-without-if-bang)))
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
@@ -519,6 +522,9 @@
   ;;;; 4. locate-dominating-file
   ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
 )
+
+(use-package embark-consult)
+(use-package wgrep)
 
 (use-package marginalia
   :config
@@ -1162,6 +1168,10 @@
   :config
   (add-hook 'term-mode-hook 'eterm-256color-mode))
 
+;; (use-package multi-term
+;;   :config
+;;   (setq multi-term-program nil))
+
 (defun vterm-directory-sync ()
   "Synchronize current working directory."
   (interactive)
@@ -1177,13 +1187,102 @@
   ;;(setq vterm-shell "zsh")
   (setq vterm-max-scrollback 10000))
 
+;;;;;;;;;;;;;;;;;;;;EVIL VTERM;;;;;;;;;;;;;;START;;;;
+
+;; ;; (use-package vterm-extra
+;; ;;   :load-path "custom/vterm-extra"
+;; ;;   :bind (("s-t" . vterm-extra-dispatcher)
+;; ;; 		  :map vterm-mode-map
+;; ;; 		  (("C-c C-e" . vterm-extra-edit-command-in-new-buffer))))
+
+;; (defvar vterm-extra-line-mode-map nil)
+;; (setq vterm-extra-line-mode-map (make-sparse-keymap))
+
+;; (define-key vterm-extra-line-mode-map (kbd "<return>")
+;;   'vterm-extra-read-and-send)
+
+;; (define-minor-mode vterm-extra-line-mode ;"VTermLine"
+;;   "Vterm extra line mode."
+;;   :global nil
+;;   :lighter " VTerm-line-mode"
+;;   (read-only-mode -1))
+
+;; (defun vterm-extra-read-and-send ()
+;;   (interactive)
+;;   (let ((command (buffer-substring-no-properties
+;; 				 (vterm--get-prompt-point) (vterm--get-end-of-line))))
+;; 	(vterm-send-C-a)
+;; 	(vterm-send-C-k)
+;; 	(vterm-send-string command)
+;; 	(vterm-send-return)))
+
+;; (defun evil-collection-vterm-insert (count &optional vcount skip-empty-lines)
+;;   (interactive
+;;    (list (prefix-numeric-value current-prefix-arg)
+;;          (and (evil-visual-state-p)
+;;               (memq (evil-visual-type) '(line block))
+;;               (save-excursion
+;;                 (let ((m (mark)))
+;;                   ;; go to upper-left corner temporarily so
+;;                   ;; `count-lines' yields accurate results
+;;                   (evil-visual-rotate 'upper-left)
+;;                   (prog1 (count-lines evil-visual-beginning evil-visual-end)
+;;                     (set-mark m)))))
+;;          (evil-visual-state-p)))
+;;   (evil-insert count vcount skip-empty-lines)
+;;   (let ((p (point)))
+;;     (vterm-reset-cursor-point)
+;;     (while (< p (point))
+;;       (vterm-send-left)
+;;       (forward-char -1))
+;;     (while (> p (point))
+;;       (vterm-send-right)
+;;       (forward-char 1))))
+
+;; (evil-collection-define-key 'normal 'vterm-mode-map "i" 'evil-collection-vterm-insert)
+
+;; (defun vterm-evil-insert ()
+;;   (interactive)
+;;   (vterm-goto-char (point))
+;;   (call-interactively #'evil-insert))
+
+;; (defun vterm-evil-append ()
+;;   (interactive)
+;;   (vterm-goto-char (1+ (point)))
+;;   (call-interactively #'evil-append))
+
+;; (defun vterm-evil-delete ()
+;;   "Provide similar behavior as `evil-delete'."
+;;   (interactive)
+;;   (let ((inhibit-read-only t))
+;;     (cl-letf (((symbol-function #'delete-region) #'vterm-delete-region))
+;;       (call-interactively 'evil-delete))))
+
+;; (defun vterm-evil-change ()
+;;   "Provide similar behavior as `evil-change'."
+;;   (interactive)
+;;   (let ((inhibit-read-only t))
+;;     (cl-letf (((symbol-function #'delete-region) #'vterm-delete-region))
+;;       (call-interactively 'evil-change))))
+
+;; (defun my-vterm-hook()
+;;   (evil-local-mode 1)
+;;   (evil-define-key 'normal 'local "a" 'vterm-evil-append)
+;;   (evil-define-key 'normal 'local "d" 'vterm-evil-delete)
+;;   (evil-define-key 'normal 'local "i" 'vterm-evil-insert)
+;;   (evil-define-key 'normal 'local "c" 'vterm-evil-change))
+
+;; (add-hook 'vterm-mode-hook 'my-vterm-hook)
+
+;;;;;;;;;;;;;;;;;;;;EVIL VTERM;;;;;;;;;;;;;;;;END
+
 (use-package multi-vterm
   :config
   (add-hook 'vterm-mode-hook
 	(lambda ()
 	  ;(setq-local evil-insert-state-cursor 'box)
 	  (evil-insert-state)))
-  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+  ;; (define-key vterm-mode-map [return]                      #'vterm-send-return)
 
   (setq vterm-keymap-exceptions nil)
   (evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
@@ -1210,9 +1309,10 @@
   (evil-define-key 'normal vterm-mode-map (kbd ",p")       #'multi-vterm-prev)
   (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
   (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
-  (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
+  ;; (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume)
+  )
 
-										;(advice-add :before #'find-file #'vterm-directory-sync)
+;(advice-add :before #'find-file #'vterm-directory-sync)
 
 ;; (defun vterm-find-file ()
 ;;   "Start vterm-directory-sync before find-file"

@@ -32,6 +32,7 @@
 (setq my-config-file (concat user-emacs-directory "org-init.el"))
 ;(org-babel-tangle-file my-org-config-file my-config-file "emacs-lisp\\|elisp")
 (org-babel-tangle-file my-org-config-file)
+(add-to-list 'load-path (concat user-emacs-directory "custom"))
 (load-file my-config-file)
 
 ;;; init.el ends here
@@ -43,9 +44,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(highlight-indent-guides-method 'character)
  '(org-superstar-leading-bullet " ")
  '(package-selected-packages
-    '(wgrep flyspell-popup corfu embark-consult embark marginalia consult orderless vertico smart-tabs-mode sly direnv multi-vterm org-bullets yasnippet-snippets yafolding which-key web-mode vterm visual-regexp-steroids use-package undo-tree try treemacs sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-download olivetti nswbuff nix-mode magit lua-mode js2-mode j-mode hindent highlight-indent-guides helpful haskell-mode good-scroll gnu-apl-mode general fold-this evil-surround evil-smartparens evil-paredit evil-org evil-nerd-commenter evil-multiedit evil-mc evil-matchit evil-lion evil-goggles evil-exchange evil-collection eterm-256color emmet-mode eimp doom-themes doom-modeline command-log-mode cmake-mode cl-libify centaur-tabs auto-dictionary auctex-latexmk anzu all-the-icons-dired))
+    '(multi-term vterm-extra wgrep flyspell-popup corfu embark-consult embark marginalia consult orderless vertico smart-tabs-mode sly direnv multi-vterm org-bullets yasnippet-snippets yafolding which-key web-mode vterm visual-regexp-steroids use-package undo-tree try treemacs sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-download olivetti nswbuff nix-mode magit lua-mode js2-mode j-mode hindent highlight-indent-guides helpful haskell-mode good-scroll gnu-apl-mode general fold-this evil-surround evil-smartparens evil-paredit evil-org evil-nerd-commenter evil-multiedit evil-mc evil-matchit evil-lion evil-goggles evil-exchange evil-collection eterm-256color emmet-mode eimp doom-themes doom-modeline command-log-mode cmake-mode cl-libify centaur-tabs auto-dictionary auctex-latexmk anzu all-the-icons-dired))
  '(vr/engine 'pcre2el))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -62,3 +64,4 @@
  '(evil-goggles-yank-face ((t (:inherit diff-changed))))
  '(highlight ((t (:background "#555555" :foreground "#f2e5c6"))))
  '(org-superstar-leading ((t (:inherit default)))))
+(put 'dired-find-alternate-file 'disabled nil)
