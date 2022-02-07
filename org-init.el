@@ -352,16 +352,7 @@
   :init
   (vertico-mode)
   (setq vertico-cycle t)
-  (setq vertico-resize nil)
-  :bind (:map vertico-map
-		  ("C-j" . vertico-next)
-		  ("C-k" . vertico-previous)
-		  ("C-d" . vertico-scroll-down)
-		  ("C-u" . vertico-scroll-up) ())
-  :config
-  (setq completion-styles '(substring orderless)
-	read-file-name-completion-ignore-case t ;; Ignore Case w/ files
-	read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
+  (setq vertico-resize nil))
 
 ;; Optionally use the `orderless' completion style. See
 ;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
@@ -373,7 +364,7 @@
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch))
-  (setq completion-styles '(substring orderless)
+  (setq completion-styles '(orderless)
 		completion-category-defaults nil
 		completion-category-overrides '((file (styles partial-completion)))))
 
@@ -551,56 +542,6 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package corfu
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-  ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-  ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
-  ;; (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
-
-  ;; Optionally use TAB for cycling, default is `corfu-complete'.
-  :bind (:map corfu-map
-		 ("C-j" . corfu-next)
-		 ("TAB" . corfu-next)
-		 ([tab] . corfu-next)
-		 ("C-k" . corfu-previous)
-		 ("S-TAB" . corfu-previous)
-		 ([backtab] . corfu-previous))
-
-  ;; You may want to enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since dabbrev can be used globally (M-/).
-  :init
-  (corfu-global-mode))
-
-;; Dabbrev works with Corfu
-(use-package dabbrev
-  ;; Swap M-/ and C-M-/
-  :bind (("M-/" . dabbrev-completion)
-		 ("C-M-/" . dabbrev-expand)))
-
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
-
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
-
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
-
 (use-package doom-modeline
       :init (doom-modeline-mode 1))
 
@@ -648,12 +589,6 @@
 
 (use-package magit
   :defer t)
-
-(use-package flyspell-popup
-  :defer t
-  :config
-  (define-key flyspell-mode-map (kbd "C-;") #'flyspell-popup-correct)
-  (add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode))
 
 (use-package org
   :config
@@ -1679,131 +1614,126 @@
     (load-file my-config-file))
 
 (global-set-key (kbd "M-j") 'hamza/insert-line-below)
-    (global-set-key (kbd "M-k") 'hamza/insert-line-above)
-    (global-set-key (kbd "M-C-j") 'hamza/remove-line-below)
-    (global-set-key (kbd "M-C-k") 'hamza/remove-line-above)
+(global-set-key (kbd "M-k") 'hamza/insert-line-above)
+(global-set-key (kbd "M-C-j") 'hamza/remove-line-below)
+(global-set-key (kbd "M-C-k") 'hamza/remove-line-above)
 
-    ;; Will make it a lot less annoying to use Evil in the minibuffer and in M-x
-;; Removing "insert-digraph" and unbinding C-k in insert-mode
-    (eval-after-load "evil-maps"
-      (define-key evil-insert-state-map "\C-k" nil))
+(use-package general
+  :config
+  ;; (general-define-key
+  ;;  :states '(normal visual)
+  ;;  :keymaps 'override ;; override any existing keybindings
 
-    (use-package general
-      :config
-      ;; (general-define-key
-      ;;  :states '(normal visual)
-      ;;  :keymaps 'override ;; override any existing keybindings
+  ;;  ""
 
-      ;;  ""
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'override ;; override any existing keybindings
+   :prefix "SPC"
+   :non-normal-prefix "C-SPC"
 
-      (general-define-key
-       :states '(normal visual insert emacs)
-       :keymaps 'override ;; override any existing keybindings
-       :prefix "SPC"
-       :non-normal-prefix "C-SPC"
+   ;;; General ;)
+   "SPC" '(vterm-find-file :which-key "Find File")
+   "s" '(save-buffer :which-key "Save Buffer")
 
-       ;;; General ;)
-       "SPC" '(vterm-find-file :which-key "Find File")
-       "s" '(save-buffer :which-key "Save Buffer")
+   ;;; Files
+   "f" '(:ignore t :which-key "Files")
+   "ff" '(find-file :which-key "Find File")
+   "ft" '((lambda () (interactive)(find-file "~/wrk/todo.org")) :which-key "Todo")
+   ;; Dev
+   "fd" '(:ignore t :which-key "Development")
+   "fdd" '((lambda () (interactive)(find-file "~/dev")) :which-key "Development")
+   "fdj" '((lambda () (interactive)(find-file "~/dev/java")) :which-key "Java")
+   "fdc" '((lambda () (interactive)(find-file "~/dev/cpp")) :which-key "C++")
+   "fdh" '((lambda () (interactive)(find-file "~/dev/haskell")) :which-key "Haskell")
+   ;; Dev/Learning
+   "fdl" '(:ignore t :which-key "Learning")
+   "fdld" '((lambda () (interactive)(find-file "~/dev/learning")) :which-key "Learning")
+   "fdlj" '((lambda () (interactive)(find-file "~/dev/learning/java")) :which-key "Java")
+   "fdlc" '((lambda () (interactive)(find-file "~/dev/learning/cpp")) :which-key "C++")
+   "fdlh" '((lambda () (interactive)(find-file "~/dev/learning/haskell")) :which-key "Haskell")
+   ;; Education
+   "fe" '(:ignore t :which-key "Education")
+   "fec" '(:ignore t :which-key "Computer Science")
+   "fecn" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/notes/notes.org")) :which-key "Notes")
+   "fecp" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/pp/")) :which-key "Past Papers")
+   "fep" '(:ignore t :which-key "Physics")
+   "fepn" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/notes.org")) :which-key "Notes")
+   "fepk" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/khanacademy-notes.org")) :which-key "Khan Academy Notes")
+   "fepp" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/pp/")) :which-key "Past Papers")
+   "fem" '(:ignore t :which-key "Maths")
+   "femn" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/notes/notes.org")) :which-key "Notes")
+   "femp" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/pp/")) :which-key "Past Papers")
+   "fei" '(:ignore t :which-key "Islamiyat")
+   "fein" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/notes/notes.org")) :which-key "Islamiyat")
+   "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
+   ;; Config Files
+   "fc" '(:ignore t :which-key "Configuration Files")
+   "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
+   "fcw" '(:ignore t :which-key "WM Config Files")
+   "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
+   "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
 
-       ;;; Files
-       "f" '(:ignore t :which-key "Files")
-       "ff" '(find-file :which-key "Find File")
-       "ft" '((lambda () (interactive)(find-file "~/wrk/todo.org")) :which-key "Todo")
-       ;; Dev
-       "fd" '(:ignore t :which-key "Development")
-       "fdd" '((lambda () (interactive)(find-file "~/dev")) :which-key "Development")
-       "fdj" '((lambda () (interactive)(find-file "~/dev/java")) :which-key "Java")
-       "fdc" '((lambda () (interactive)(find-file "~/dev/cpp")) :which-key "C++")
-       "fdh" '((lambda () (interactive)(find-file "~/dev/haskell")) :which-key "Haskell")
-       ;; Dev/Learning
-       "fdl" '(:ignore t :which-key "Learning")
-       "fdld" '((lambda () (interactive)(find-file "~/dev/learning")) :which-key "Learning")
-       "fdlj" '((lambda () (interactive)(find-file "~/dev/learning/java")) :which-key "Java")
-       "fdlc" '((lambda () (interactive)(find-file "~/dev/learning/cpp")) :which-key "C++")
-       "fdlh" '((lambda () (interactive)(find-file "~/dev/learning/haskell")) :which-key "Haskell")
-       ;; Education
-       "fe" '(:ignore t :which-key "Education")
-       "fec" '(:ignore t :which-key "Computer Science")
-       "fecn" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/notes/notes.org")) :which-key "Notes")
-       "fecp" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/pp/")) :which-key "Past Papers")
-       "fep" '(:ignore t :which-key "Physics")
-       "fepn" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/notes.org")) :which-key "Notes")
-       "fepk" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/khanacademy-notes.org")) :which-key "Khan Academy Notes")
-       "fepp" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/pp/")) :which-key "Past Papers")
-       "fem" '(:ignore t :which-key "Maths")
-       "femn" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/notes/notes.org")) :which-key "Notes")
-       "femp" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/pp/")) :which-key "Past Papers")
-       "fei" '(:ignore t :which-key "Islamiyat")
-       "fein" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/notes/notes.org")) :which-key "Islamiyat")
-       "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
-       ;; Config Files
-       "fc" '(:ignore t :which-key "Configuration Files")
-       "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
-       "fcw" '(:ignore t :which-key "WM Config Files")
-       "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
-       "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
+   ;;; Code
+   "c" '(:ignore t :which-key "Code")
+   "cc" '(compile :which-key "Compile")
+   "ce" '(eshell-command :which-key "Run a Command in Eshell")
+   "cs" '(eval-last-sexp :which-key "Run Elisp Code before Point")
 
-       ;;; Code
-       "c" '(:ignore t :which-key "Code")
-       "cc" '(compile :which-key "Compile")
-       "ce" '(eshell-command :which-key "Run a Command in Eshell")
-       "cs" '(eval-last-sexp :which-key "Run Elisp Code before Point")
+   ;;; Applications
+   "a" '(:ignore t :which-key "Applications")
+   "ad" '(dired :which-key "Dired")
+   "ae" '(eshell :which-key "Eshell")
+   "ar" '(ranger :which-key "Ranger")
+   "av" '(vterm :which-key "Vterm")
 
-       ;;; Applications
-       "a" '(:ignore t :which-key "Applications")
-       "ad" '(dired :which-key "Dired")
-       "ae" '(eshell :which-key "Eshell")
-       "ar" '(ranger :which-key "Ranger")
-       "av" '(vterm :which-key "Vterm")
+   ;;; Buffers
+   "b" '(:ignore t :which-key "Buffers")
+   "bb" '(switch-to-buffer :which-key "Switch to Buffer")
+   "bB" '(ibuffer :which-key "ibuffer")
+   "bk" '(kill-current-buffer :which-key "Kill Buffer")
+   "br" '(revert-buffer :which-key "Revert Buffer")
 
-       ;;; Buffers
-       "b" '(:ignore t :which-key "Buffers")
-       "bb" '(switch-to-buffer :which-key "Switch to Buffer")
-       "bB" '(ibuffer :which-key "ibuffer")
-       "bk" '(kill-current-buffer :which-key "Kill Buffer")
-       "br" '(revert-buffer :which-key "Revert Buffer")
+   ;;; Toggle
+   "t" '(:ignore t :which-key "Toggle")
+   "tf" '(flyspell-mode :which-key "Flyspell")
+   "tt" '(treemacs :which-key "Treemacs")
+   "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
+   "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
+   "tg" '(evil-goggles-mode :which-key "Evil Goggles")
+   "ts" '(:ignore t :which-key "Smartparens")
+   "tst" '(smartparens-mode :which-key "Smartparens Mode")
+   "tss" '(smartparens-strict-mode :which-key "Strict Mode")
 
-       ;;; Toggle
-       "t" '(:ignore t :which-key "Toggle")
-       "tf" '(flyspell-mode :which-key "Flyspell")
-       "tt" '(treemacs :which-key "Treemacs")
-       "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
-       "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
-       "tg" '(evil-goggles-mode :which-key "Evil Goggles")
-       "ts" '(:ignore t :which-key "Smartparens")
-       "tst" '(smartparens-mode :which-key "Smartparens Mode")
-       "tss" '(smartparens-strict-mode :which-key "Strict Mode")
+   ;;; Org Mode
+   "o" '(:ignore t :which-key "Org")
+   "oj" '(org-insert-subheading :which-key "Insert Subheading")
+   "oJ" '(org-insert-heading :which-key "Insert Heading")
+   "ow" '(org-todo :which-key "Org Todo") ;; w for work... I don't know man.
+   ;; Headings
+   "oh" '(:ignore t :which-key "Headings")
+   "ohs" '(:ignore t :which-key "Subheading")
+   "ohst" '(org-insert-todo-subheading :which-key "Todo Subheading")
+   ;; Links
+   "ol" '(:ignore t :which-key "Link")
+   "olf" '(org-open-at-point :which-key "Follow Link")
+   "ols" '(org-store-link :which-key "Store Link")
+   ;; Code / Babel
+   "oc" '(:ignore t :which-key "Code")
+   "ocr" '(hamza/reload-config :which-key "Reload Config")
+   "occ" '(org-babel-execute-src-block :which-key "Compile")
+   "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
+   ;; Org Roam
+   "or" '(:ignore t :which-key "Org Roam")
+   "ori" '(org-roam-insert :which-key "Insert")
+   "orf" '(org-roam-find-file :which-key "Find File")
+   "org" '(org-roam-graph :which-key "Display Graph")
+   "orc" '(org-roam-capture :which-key "Org Capture")
+   ;; Org Tex
+   "ot" '(:ignore t :which-key "TeX/LaTeX")
+   "otp" '(org-latex-preview :which-key "LaTeX Preview")
+   "otb" '(org-beamer-export-to-pdf :which-key "Export Beamer to PDF")
+   "otc" '(org-latex-export-to-pdf :which-key "Export LaTeX to PDF")))
 
-       ;;; Org Mode
-       "o" '(:ignore t :which-key "Org")
-       "oj" '(org-insert-subheading :which-key "Insert Subheading")
-       "oJ" '(org-insert-heading :which-key "Insert Heading")
-       "ow" '(org-todo :which-key "Org Todo") ;; w for work... I don't know man.
-       ;; Headings
-       "oh" '(:ignore t :which-key "Headings")
-       "ohs" '(:ignore t :which-key "Subheading")
-       "ohst" '(org-insert-todo-subheading :which-key "Todo Subheading")
-       ;; Links
-       "ol" '(:ignore t :which-key "Link")
-       "olf" '(org-open-at-point :which-key "Follow Link")
-       "ols" '(org-store-link :which-key "Store Link")
-       ;; Code / Babel
-       "oc" '(:ignore t :which-key "Code")
-       "ocr" '(hamza/reload-config :which-key "Reload Config")
-       "occ" '(org-babel-execute-src-block :which-key "Compile")
-       "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
-       ;; Org Roam
-       "or" '(:ignore t :which-key "Org Roam")
-       "ori" '(org-roam-insert :which-key "Insert")
-       "orf" '(org-roam-find-file :which-key "Find File")
-       "org" '(org-roam-graph :which-key "Display Graph")
-       "orc" '(org-roam-capture :which-key "Org Capture")
-       ;; Org Tex
-       "ot" '(:ignore t :which-key "TeX/LaTeX")
-       "otp" '(org-latex-preview :which-key "LaTeX Preview")
-       "otb" '(org-beamer-export-to-pdf :which-key "Export Beamer to PDF")
-       "otc" '(org-latex-export-to-pdf :which-key "Export LaTeX to PDF")))
-
-       ;;; TeX
-       ;"t" '(:ignore t :which-key "TeX/LaTeX")
+   ;;; TeX
+   ;"t" '(:ignore t :which-key "TeX/LaTeX")
