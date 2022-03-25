@@ -360,8 +360,8 @@
 		  ("C-u" . vertico-scroll-up) ())
   :config
   (setq completion-styles '(substring orderless)
-	read-file-name-completion-ignore-case t ;; Ignore Case w/ files
-	read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
+		read-file-name-completion-ignore-case t ;; Ignore Case w/ files
+		read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
 
 
 ;; Components starting with ! indicate the rest of the component must not occur in the candidate
@@ -376,7 +376,7 @@
   :init
   (setq completion-styles '(substring orderless)
 		completion-category-defaults nil
-		completion-category-overrides '((file (styles . '(partial-completion))))
+		completion-category-overrides '((file (styles partial-completion)))
 		orderless-matching-styles '(orderless-flex orderless-literal orderless-regexp)
 		orderless-style-dispatchers '(hamza/orderless-without-if-bang)))
 
@@ -655,6 +655,9 @@
 (use-package magit
   :defer t)
 
+(use-package keychain-environment
+  :defer t)
+
 (use-package flyspell-popup
   :defer t
   :config
@@ -701,7 +704,8 @@
   :hook (org-mode . olivetti-mode)
   :init
   (setq olivetti-body-width 90)
-  (setq fill-column 80))
+  (setq fill-column 80)
+  (add-hook 'olivetti-mode-hook 'hamza/default-olivetti-resize))
 
 ;; (use-package org-drill
 ;;   :hook (org-mode . org-drill))
@@ -725,6 +729,7 @@
 
 ;; Drag-and-drop to `dired`
 (add-hook 'dired-mode-hook 'org-download-enable)
+(add-hook 'dired-mode-hook (lambda () (text-scale-increase 2)))
 
 (use-package all-the-icons-dired
   :config
@@ -797,10 +802,10 @@
 
 ;; Which key helps find commands by popping a panel
 (use-package which-key
-  :init (which-key-mode)
-  :after-init
-  (setq which-key-idle-delay 0.2)
   :diminish which-key-mode
+  :init (which-key-mode)
+  ;; :after-init
+  ;; (setq which-key-idle-delay 0.2)
   :config
   (setq which-key-idle-delay 0.2)) ; delay before popping up the which-key panel
 
@@ -823,7 +828,7 @@
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil) ; Adds more vim bindings to other parts of emacs. I use evil-collection instead
   (setq evil-want-minibuffer t) ; Enables evil in the minibuffer
-  (setq evil-want-C-u-scroll t) ; Use C-u as go up instead of universal argument
+  (setq evil-want-C-u-scroll nil) ; Use C-u as go up instead of universal argument
   (setq evil-want-C-i-jump nil)
   (setq evil-want-Y-yank-to-eol t) ; Make Shift-Y yank to end of line instead of yanking whole line
   ;(setq evilmi-may-jump-by-percentage nil)
@@ -1183,9 +1188,16 @@
 (use-package vterm
   :commands vterm
   :config
+  (add-hook 'vterm-mode-hook
+	(lambda ()
+	  (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+	  (buffer-face-mode t)))
+
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
   ;;(setq vterm-shell "zsh")
-  (setq vterm-max-scrollback 10000))
+  (setq vterm-max-scrollback 10000)
+  (add-to-list 'vterm-eval-cmds
+	'("update-pwd" (lambda (path) (setq default-directory path)))))
 
 ;;;;;;;;;;;;;;;;;;;;EVIL VTERM;;;;;;;;;;;;;;START;;;;
 
@@ -1280,7 +1292,7 @@
   :config
   (add-hook 'vterm-mode-hook
 	(lambda ()
-	  ;(setq-local evil-insert-state-cursor 'box)
+										;(setq-local evil-insert-state-cursor 'box)
 	  (evil-insert-state)))
   ;; (define-key vterm-mode-map [return]                      #'vterm-send-return)
 
@@ -1302,7 +1314,7 @@
   (evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
   (evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
   (evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
-  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "M-SPC")    nil)
   (evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
   (evil-define-key 'normal vterm-mode-map (kbd ",c")       #'multi-vterm)
   (evil-define-key 'normal vterm-mode-map (kbd ",n")       #'multi-vterm-next)
@@ -1312,7 +1324,7 @@
   ;; (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume)
   )
 
-;(advice-add :before #'find-file #'vterm-directory-sync)
+										;(advice-add :before #'find-file #'vterm-directory-sync)
 
 ;; (defun vterm-find-file ()
 ;;   "Start vterm-directory-sync before find-file"
@@ -1779,131 +1791,125 @@
     (load-file my-config-file))
 
 (global-set-key (kbd "M-j") 'hamza/insert-line-below)
-    (global-set-key (kbd "M-k") 'hamza/insert-line-above)
-    (global-set-key (kbd "M-C-j") 'hamza/remove-line-below)
-    (global-set-key (kbd "M-C-k") 'hamza/remove-line-above)
+(global-set-key (kbd "M-k") 'hamza/insert-line-above)
+(global-set-key (kbd "M-C-j") 'hamza/remove-line-below)
+(global-set-key (kbd "M-C-k") 'hamza/remove-line-above)
 
-    ;; Will make it a lot less annoying to use Evil in the minibuffer and in M-x
+;; Will make it a lot less annoying to use Evil in the minibuffer and in M-x
 ;; Removing "insert-digraph" and unbinding C-k in insert-mode
-    (eval-after-load "evil-maps"
-      (define-key evil-insert-state-map "\C-k" nil))
+(eval-after-load "evil-maps"
+  (define-key evil-insert-state-map "\C-k" nil))
 
-    (use-package general
-      :config
-      ;; (general-define-key
-      ;;  :states '(normal visual)
-      ;;  :keymaps 'override ;; override any existing keybindings
+(use-package general
+  :config
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'override ;; override any existing keybindings
+   :prefix "SPC"
+   :non-normal-prefix "M-SPC"
 
-      ;;  ""
+   ;;; General ;)
+   "SPC" '(vterm-find-file :which-key "Find File")
+   "s" '(save-buffer :which-key "Save Buffer")
 
-      (general-define-key
-       :states '(normal visual insert emacs)
-       :keymaps 'override ;; override any existing keybindings
-       :prefix "SPC"
-       :non-normal-prefix "C-SPC"
+   ;;; Files
+   "f" '(:ignore t :which-key "Files")
+   "ff" '(find-file :which-key "Find File")
+   "ft" '((lambda () (interactive)(find-file "~/wrk/todo.org")) :which-key "Todo")
+   ;; Dev
+   "fd" '(:ignore t :which-key "Development")
+   "fdd" '((lambda () (interactive)(find-file "~/dev")) :which-key "Development")
+   "fdj" '((lambda () (interactive)(find-file "~/dev/java")) :which-key "Java")
+   "fdc" '((lambda () (interactive)(find-file "~/dev/cpp")) :which-key "C++")
+   "fdh" '((lambda () (interactive)(find-file "~/dev/haskell")) :which-key "Haskell")
+   ;; Dev/Learning
+   "fdl" '(:ignore t :which-key "Learning")
+   "fdld" '((lambda () (interactive)(find-file "~/dev/learning")) :which-key "Learning")
+   "fdlj" '((lambda () (interactive)(find-file "~/dev/learning/java")) :which-key "Java")
+   "fdlc" '((lambda () (interactive)(find-file "~/dev/learning/cpp")) :which-key "C++")
+   "fdlh" '((lambda () (interactive)(find-file "~/dev/learning/haskell")) :which-key "Haskell")
+   ;; Education
+   "fe" '(:ignore t :which-key "Education")
+   "fec" '(:ignore t :which-key "Computer Science")
+   "fecn" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/notes/notes.org")) :which-key "Notes")
+   "fecp" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/pp/")) :which-key "Past Papers")
+   "fep" '(:ignore t :which-key "Physics")
+   "fepn" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/notes.org")) :which-key "Notes")
+   "fepk" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/khanacademy-notes.org")) :which-key "Khan Academy Notes")
+   "fepp" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/pp/")) :which-key "Past Papers")
+   "fem" '(:ignore t :which-key "Maths")
+   "femn" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/notes/notes.org")) :which-key "Notes")
+   "femp" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/pp/")) :which-key "Past Papers")
+   "fei" '(:ignore t :which-key "Islamiyat")
+   "fein" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/notes/notes.org")) :which-key "Islamiyat")
+   "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
+   ;; Config Files
+   "fc" '(:ignore t :which-key "Configuration Files")
+   "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
+   "fcw" '(:ignore t :which-key "WM Config Files")
+   "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
+   "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
 
-       ;;; General ;)
-       "SPC" '(vterm-find-file :which-key "Find File")
-       "s" '(save-buffer :which-key "Save Buffer")
+   ;;; Code
+   "c" '(:ignore t :which-key "Code")
+   "cc" '(compile :which-key "Compile")
+   "ce" '(eshell-command :which-key "Run a Command in Eshell")
+   "cs" '(eval-last-sexp :which-key "Run Elisp Code before Point")
 
-       ;;; Files
-       "f" '(:ignore t :which-key "Files")
-       "ff" '(find-file :which-key "Find File")
-       "ft" '((lambda () (interactive)(find-file "~/wrk/todo.org")) :which-key "Todo")
-       ;; Dev
-       "fd" '(:ignore t :which-key "Development")
-       "fdd" '((lambda () (interactive)(find-file "~/dev")) :which-key "Development")
-       "fdj" '((lambda () (interactive)(find-file "~/dev/java")) :which-key "Java")
-       "fdc" '((lambda () (interactive)(find-file "~/dev/cpp")) :which-key "C++")
-       "fdh" '((lambda () (interactive)(find-file "~/dev/haskell")) :which-key "Haskell")
-       ;; Dev/Learning
-       "fdl" '(:ignore t :which-key "Learning")
-       "fdld" '((lambda () (interactive)(find-file "~/dev/learning")) :which-key "Learning")
-       "fdlj" '((lambda () (interactive)(find-file "~/dev/learning/java")) :which-key "Java")
-       "fdlc" '((lambda () (interactive)(find-file "~/dev/learning/cpp")) :which-key "C++")
-       "fdlh" '((lambda () (interactive)(find-file "~/dev/learning/haskell")) :which-key "Haskell")
-       ;; Education
-       "fe" '(:ignore t :which-key "Education")
-       "fec" '(:ignore t :which-key "Computer Science")
-       "fecn" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/notes/notes.org")) :which-key "Notes")
-       "fecp" '((lambda () (interactive)(find-file "~/edu/o-lvls/comp/pp/")) :which-key "Past Papers")
-       "fep" '(:ignore t :which-key "Physics")
-       "fepn" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/notes.org")) :which-key "Notes")
-       "fepk" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/notes/khanacademy-notes.org")) :which-key "Khan Academy Notes")
-       "fepp" '((lambda () (interactive)(find-file "~/edu/o-lvls/phys/pp/")) :which-key "Past Papers")
-       "fem" '(:ignore t :which-key "Maths")
-       "femn" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/notes/notes.org")) :which-key "Notes")
-       "femp" '((lambda () (interactive)(find-file "~/edu/o-lvls/math/pp/")) :which-key "Past Papers")
-       "fei" '(:ignore t :which-key "Islamiyat")
-       "fein" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/notes/notes.org")) :which-key "Islamiyat")
-       "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
-       ;; Config Files
-       "fc" '(:ignore t :which-key "Configuration Files")
-       "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
-       "fcw" '(:ignore t :which-key "WM Config Files")
-       "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
-       "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
+   ;;; Applications
+   "a" '(:ignore t :which-key "Applications")
+   "ad" '(dired :which-key "Dired")
+   "ae" '(eshell :which-key "Eshell")
+   "ar" '(ranger :which-key "Ranger")
+   "av" '(vterm :which-key "Vterm")
 
-       ;;; Code
-       "c" '(:ignore t :which-key "Code")
-       "cc" '(compile :which-key "Compile")
-       "ce" '(eshell-command :which-key "Run a Command in Eshell")
-       "cs" '(eval-last-sexp :which-key "Run Elisp Code before Point")
+   ;;; Buffers
+   "b" '(:ignore t :which-key "Buffers")
+   "bb" '(switch-to-buffer :which-key "Switch to Buffer")
+   "bB" '(ibuffer :which-key "ibuffer")
+   "bk" '(kill-current-buffer :which-key "Kill Buffer")
+   "br" '(revert-buffer :which-key "Revert Buffer")
 
-       ;;; Applications
-       "a" '(:ignore t :which-key "Applications")
-       "ad" '(dired :which-key "Dired")
-       "ae" '(eshell :which-key "Eshell")
-       "ar" '(ranger :which-key "Ranger")
-       "av" '(vterm :which-key "Vterm")
+   ;;; Toggle
+   "t" '(:ignore t :which-key "Toggle")
+   "tf" '(flyspell-mode :which-key "Flyspell")
+   "tt" '(treemacs :which-key "Treemacs")
+   "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
+   "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
+   "tg" '(evil-goggles-mode :which-key "Evil Goggles")
+   "ts" '(:ignore t :which-key "Smartparens")
+   "tst" '(smartparens-mode :which-key "Smartparens Mode")
+   "tss" '(smartparens-strict-mode :which-key "Strict Mode")
 
-       ;;; Buffers
-       "b" '(:ignore t :which-key "Buffers")
-       "bb" '(switch-to-buffer :which-key "Switch to Buffer")
-       "bB" '(ibuffer :which-key "ibuffer")
-       "bk" '(kill-current-buffer :which-key "Kill Buffer")
-       "br" '(revert-buffer :which-key "Revert Buffer")
+   ;;; Org Mode
+   "o" '(:ignore t :which-key "Org")
+   "oj" '(org-insert-subheading :which-key "Insert Subheading")
+   "oJ" '(org-insert-heading :which-key "Insert Heading")
+   "ow" '(org-todo :which-key "Org Todo") ;; w for work... I don't know man.
+   ;; Headings
+   "oh" '(:ignore t :which-key "Headings")
+   "ohs" '(:ignore t :which-key "Subheading")
+   "ohst" '(org-insert-todo-subheading :which-key "Todo Subheading")
+   ;; Links
+   "ol" '(:ignore t :which-key "Link")
+   "olf" '(org-open-at-point :which-key "Follow Link")
+   "ols" '(org-store-link :which-key "Store Link")
+   ;; Code / Babel
+   "oc" '(:ignore t :which-key "Code")
+   "ocr" '(hamza/reload-config :which-key "Reload Config")
+   "occ" '(org-babel-execute-src-block :which-key "Compile")
+   "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
+   ;; Org Roam
+   "or" '(:ignore t :which-key "Org Roam")
+   "ori" '(org-roam-insert :which-key "Insert")
+   "orf" '(org-roam-find-file :which-key "Find File")
+   "org" '(org-roam-graph :which-key "Display Graph")
+   "orc" '(org-roam-capture :which-key "Org Capture")
+   ;; Org Tex
+   "ot" '(:ignore t :which-key "TeX/LaTeX")
+   "otp" '(org-latex-preview :which-key "LaTeX Preview")
+   "otb" '(org-beamer-export-to-pdf :which-key "Export Beamer to PDF")
+   "otc" '(org-latex-export-to-pdf :which-key "Export LaTeX to PDF")))
 
-       ;;; Toggle
-       "t" '(:ignore t :which-key "Toggle")
-       "tf" '(flyspell-mode :which-key "Flyspell")
-       "tt" '(treemacs :which-key "Treemacs")
-       "tc" '(centaur-tabs-local-mode :which-key "Centaur Tabs")
-       "tl" '(global-display-line-numbers-mode :which-key "Line Numbers")
-       "tg" '(evil-goggles-mode :which-key "Evil Goggles")
-       "ts" '(:ignore t :which-key "Smartparens")
-       "tst" '(smartparens-mode :which-key "Smartparens Mode")
-       "tss" '(smartparens-strict-mode :which-key "Strict Mode")
-
-       ;;; Org Mode
-       "o" '(:ignore t :which-key "Org")
-       "oj" '(org-insert-subheading :which-key "Insert Subheading")
-       "oJ" '(org-insert-heading :which-key "Insert Heading")
-       "ow" '(org-todo :which-key "Org Todo") ;; w for work... I don't know man.
-       ;; Headings
-       "oh" '(:ignore t :which-key "Headings")
-       "ohs" '(:ignore t :which-key "Subheading")
-       "ohst" '(org-insert-todo-subheading :which-key "Todo Subheading")
-       ;; Links
-       "ol" '(:ignore t :which-key "Link")
-       "olf" '(org-open-at-point :which-key "Follow Link")
-       "ols" '(org-store-link :which-key "Store Link")
-       ;; Code / Babel
-       "oc" '(:ignore t :which-key "Code")
-       "ocr" '(hamza/reload-config :which-key "Reload Config")
-       "occ" '(org-babel-execute-src-block :which-key "Compile")
-       "ocl" '((lambda() (interactive) (org-babel-execute-src-block) (org-redisplay-inline-images)) :which-key "Latex Compile")
-       ;; Org Roam
-       "or" '(:ignore t :which-key "Org Roam")
-       "ori" '(org-roam-insert :which-key "Insert")
-       "orf" '(org-roam-find-file :which-key "Find File")
-       "org" '(org-roam-graph :which-key "Display Graph")
-       "orc" '(org-roam-capture :which-key "Org Capture")
-       ;; Org Tex
-       "ot" '(:ignore t :which-key "TeX/LaTeX")
-       "otp" '(org-latex-preview :which-key "LaTeX Preview")
-       "otb" '(org-beamer-export-to-pdf :which-key "Export Beamer to PDF")
-       "otc" '(org-latex-export-to-pdf :which-key "Export LaTeX to PDF")))
-
-       ;;; TeX
-       ;"t" '(:ignore t :which-key "TeX/LaTeX")
+   ;;; TeX
+   ;"t" '(:ignore t :which-key "TeX/LaTeX")

@@ -27,6 +27,9 @@
 ;; Because the org config file and tangled file should follow this rule: (Taken from org-babel-load-file help)
 ;(let ((tangled-file (concat (file-name-sans-extension file) ".el")))
 
+(add-to-list 'default-frame-alist '(width  . 1920))
+(add-to-list 'default-frame-alist '(height . 1080))
+
 (require 'org)
 (setq my-org-config-file (concat user-emacs-directory "init.org"))
 (setq my-config-file (concat user-emacs-directory "org-init.el"))
@@ -47,7 +50,7 @@
  '(highlight-indent-guides-method 'character)
  '(org-superstar-leading-bullet " ")
  '(package-selected-packages
-    '(multi-term vterm-extra wgrep flyspell-popup corfu embark-consult embark marginalia consult orderless vertico smart-tabs-mode sly direnv multi-vterm org-bullets yasnippet-snippets yafolding which-key web-mode vterm visual-regexp-steroids use-package undo-tree try treemacs sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-download olivetti nswbuff nix-mode magit lua-mode js2-mode j-mode hindent highlight-indent-guides helpful haskell-mode good-scroll gnu-apl-mode general fold-this evil-surround evil-smartparens evil-paredit evil-org evil-nerd-commenter evil-multiedit evil-mc evil-matchit evil-lion evil-goggles evil-exchange evil-collection eterm-256color emmet-mode eimp doom-themes doom-modeline command-log-mode cmake-mode cl-libify centaur-tabs auto-dictionary auctex-latexmk anzu all-the-icons-dired))
+    '(keychain-environment multi-term vterm-extra wgrep flyspell-popup corfu embark-consult embark marginalia consult orderless vertico smart-tabs-mode sly direnv multi-vterm org-bullets yasnippet-snippets yafolding which-key web-mode vterm visual-regexp-steroids use-package undo-tree try treemacs sublimity smooth-scrolling restart-emacs ranger rainbow-delimiters quelpa projectile pdf-tools org-superstar org-download olivetti nswbuff nix-mode magit lua-mode js2-mode j-mode hindent highlight-indent-guides helpful haskell-mode good-scroll gnu-apl-mode general fold-this evil-surround evil-smartparens evil-paredit evil-org evil-nerd-commenter evil-multiedit evil-mc evil-matchit evil-lion evil-goggles evil-exchange evil-collection eterm-256color emmet-mode eimp doom-themes doom-modeline command-log-mode cmake-mode cl-libify centaur-tabs auto-dictionary auctex-latexmk anzu all-the-icons-dired))
  '(vr/engine 'pcre2el))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

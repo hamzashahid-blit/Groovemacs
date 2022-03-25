@@ -407,8 +407,8 @@
 			  ("C-u" . vertico-scroll-up) ())
 	  :config
 	  (setq completion-styles '(substring orderless)
-		read-file-name-completion-ignore-case t ;; Ignore Case w/ files
-		read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
+			read-file-name-completion-ignore-case t ;; Ignore Case w/ files
+			read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
 
 
 	;; Components starting with ! indicate the rest of the component must not occur in the candidate
@@ -423,7 +423,7 @@
 	  :init
 	  (setq completion-styles '(substring orderless)
 			completion-category-defaults nil
-			completion-category-overrides '((file (styles . '(partial-completion))))
+			completion-category-overrides '((file (styles partial-completion)))
 			orderless-matching-styles '(orderless-flex orderless-literal orderless-regexp)
 			orderless-style-dispatchers '(hamza/orderless-without-if-bang)))
 
@@ -719,6 +719,9 @@
   #+begin_src emacs-lisp
 	(use-package magit
 	  :defer t)
+
+	(use-package keychain-environment
+	  :defer t)
   #+end_src
 
 * English
@@ -776,7 +779,8 @@
 	   :hook (org-mode . olivetti-mode)
 	   :init
 	   (setq olivetti-body-width 90)
-	   (setq fill-column 80))
+	   (setq fill-column 80)
+	   (add-hook 'olivetti-mode-hook 'hamza/default-olivetti-resize))
 
 	 ;; (use-package org-drill
 	 ;;   :hook (org-mode . org-drill))
@@ -800,6 +804,7 @@
 
 	 ;; Drag-and-drop to `dired`
 	 (add-hook 'dired-mode-hook 'org-download-enable)
+	 (add-hook 'dired-mode-hook (lambda () (text-scale-increase 2)))
    #+end_src
 
 ** Dired
@@ -893,10 +898,10 @@
   #+begin_src emacs-lisp
 	;; Which key helps find commands by popping a panel
 	(use-package which-key
-	  :init (which-key-mode)
-	  :after-init
-	  (setq which-key-idle-delay 0.2)
 	  :diminish which-key-mode
+	  :init (which-key-mode)
+	  ;; :after-init
+	  ;; (setq which-key-idle-delay 0.2)
 	  :config
 	  (setq which-key-idle-delay 0.2)) ; delay before popping up the which-key panel
 
@@ -927,7 +932,7 @@
 	  (setq evil-want-integration t)
 	  (setq evil-want-keybinding nil) ; Adds more vim bindings to other parts of emacs. I use evil-collection instead
 	  (setq evil-want-minibuffer t) ; Enables evil in the minibuffer
-	  (setq evil-want-C-u-scroll t) ; Use C-u as go up instead of universal argument
+	  (setq evil-want-C-u-scroll nil) ; Use C-u as go up instead of universal argument
 	  (setq evil-want-C-i-jump nil)
 	  (setq evil-want-Y-yank-to-eol t) ; Make Shift-Y yank to end of line instead of yanking whole line
 	  ;(setq evilmi-may-jump-by-percentage nil)
@@ -1339,9 +1344,16 @@
 	(use-package vterm
 	  :commands vterm
 	  :config
+	  (add-hook 'vterm-mode-hook
+		(lambda ()
+		  (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+		  (buffer-face-mode t)))
+
 	  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
 	  ;;(setq vterm-shell "zsh")
-	  (setq vterm-max-scrollback 10000))
+	  (setq vterm-max-scrollback 10000)
+	  (add-to-list 'vterm-eval-cmds
+		'("update-pwd" (lambda (path) (setq default-directory path)))))
 
 	;;;;;;;;;;;;;;;;;;;;EVIL VTERM;;;;;;;;;;;;;;START;;;;
 
@@ -1436,7 +1448,7 @@
 	  :config
 	  (add-hook 'vterm-mode-hook
 		(lambda ()
-		  ;(setq-local evil-insert-state-cursor 'box)
+											;(setq-local evil-insert-state-cursor 'box)
 		  (evil-insert-state)))
 	  ;; (define-key vterm-mode-map [return]                      #'vterm-send-return)
 
@@ -1458,7 +1470,7 @@
 	  (evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
 	  (evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
 	  (evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
-	  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+	  (evil-define-key 'insert vterm-mode-map (kbd "M-SPC")    nil)
 	  (evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
 	  (evil-define-key 'normal vterm-mode-map (kbd ",c")       #'multi-vterm)
 	  (evil-define-key 'normal vterm-mode-map (kbd ",n")       #'multi-vterm-next)
@@ -1468,7 +1480,7 @@
 	  ;; (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume)
 	  )
 
-	;(advice-add :before #'find-file #'vterm-directory-sync)
+											;(advice-add :before #'find-file #'vterm-directory-sync)
 
 	;; (defun vterm-find-file ()
 	;;   "Start vterm-directory-sync before find-file"
@@ -1996,23 +2008,17 @@
 	(global-set-key (kbd "M-C-k") 'hamza/remove-line-above)
 
 	;; Will make it a lot less annoying to use Evil in the minibuffer and in M-x
-    ;; Removing "insert-digraph" and unbinding C-k in insert-mode
+	;; Removing "insert-digraph" and unbinding C-k in insert-mode
 	(eval-after-load "evil-maps"
 	  (define-key evil-insert-state-map "\C-k" nil))
 
 	(use-package general
 	  :config
-	  ;; (general-define-key
-	  ;;  :states '(normal visual)
-	  ;;  :keymaps 'override ;; override any existing keybindings
-
-	  ;;  ""
-
 	  (general-define-key
 	   :states '(normal visual insert emacs)
 	   :keymaps 'override ;; override any existing keybindings
 	   :prefix "SPC"
-	   :non-normal-prefix "C-SPC"
+	   :non-normal-prefix "M-SPC"
 
 	   ;;; General ;)
 	   "SPC" '(vterm-find-file :which-key "Find File")
