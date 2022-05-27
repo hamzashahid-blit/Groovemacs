@@ -1,0 +1,14 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch pc
+# Your branch is up to date with 'origin/pc'.
+#
+# Changes to be committed:
+#	modified:   configuration.nix
+#	modified:   hardware-configuration.nix
+#	new file:   modules/btrbk.nix
+#	new file:   packages/stumpwm-wrapper.nix
+#	new file:   packages/window-manager.nix
+#

@@ -102,21 +102,21 @@
 
     ;; Make sure packages are downloaded and installed before they are run
     ;; also frees you from having to put :ensure t after installing EVERY PACKAGE.
-    (setq use-package-always-ensure t)
+(setq use-package-always-ensure t)
 
-;; Use cl-libify to remove cl errors
-    ;(use-package cl-libify
-    ;  :config
-    ;  (require 'cl-lib))
+ ;; Use cl-libify to remove cl errors
+					;(use-package cl-libify
+					;  :config
+					;  (require 'cl-lib))
 
-;; Emacs X Window Manager (EXWM)
-;; (use-package exwm
-;;   :defer t
-;;   ;; :config
-;;   ;; (require 'exwm-config)
-;;   ;; (exwm-config-default)
-;;   ;; (require 'exwm-randr)
-;;   ;; (setq exwm-randr-workspace-output-plist '(0 "LVDS1"))
+ ;; Emacs X Window Manager (EXWM)
+ ;; (use-package exwm
+ ;;   :defer t
+ ;;   ;; :config
+ ;;   ;; (require 'exwm-config)
+ ;;   ;; (exwm-config-default)
+ ;;   ;; (require 'exwm-randr)
+() ;;   ;; (setq exwm-randr-workspace-output-plist '(0 "LVDS1"))
 ;;   ;; (add-hook 'exwm-randr-screen-change-hook
 ;;   ;;               (lambda ()
 ;;   ;;               (start-process-shell-command
@@ -1462,23 +1462,18 @@
 
 (use-package evil-paredit)
 
-(use-package paredit-everywhere
-  :config
-  (add-hook 'prog-mode-hook 'paredit-everywhere-mode))
-
 (use-package sly
   :config
   (setq inferior-lisp-program "sbcl")
   ;; (add-hook 'sly-mode-hook 'set-up-sly-ac)
   ;; (eval-after-load 'auto-complete
   ;;   '(add-to-list 'ac-modes 'sly-mrepl-mode))
-  ;; (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-  ;; (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-  ;; (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-  ;; (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-  ;; (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-  ;; (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-  )
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
 
 (use-package hindent
   :defer t)

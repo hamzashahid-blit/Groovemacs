@@ -407,8 +407,8 @@
 			  ("C-u" . vertico-scroll-up) ())
 	  :config
 	  (setq completion-styles '(substring orderless)
-			read-file-name-completion-ignore-case t ;; Ignore Case w/ files
-			read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
+		read-file-name-completion-ignore-case t ;; Ignore Case w/ files
+		read-buffer-completion-ignore-case t))  ;; Ignore Case w/ buffers
 
 
 	;; Components starting with ! indicate the rest of the component must not occur in the candidate
@@ -423,7 +423,7 @@
 	  :init
 	  (setq completion-styles '(substring orderless)
 			completion-category-defaults nil
-			completion-category-overrides '((file (styles partial-completion)))
+			completion-category-overrides '((file (styles . '(partial-completion))))
 			orderless-matching-styles '(orderless-flex orderless-literal orderless-regexp)
 			orderless-style-dispatchers '(hamza/orderless-without-if-bang)))
 
@@ -719,9 +719,6 @@
   #+begin_src emacs-lisp
 	(use-package magit
 	  :defer t)
-
-	(use-package keychain-environment
-	  :defer t)
   #+end_src
 
 * English
@@ -779,8 +776,7 @@
 	   :hook (org-mode . olivetti-mode)
 	   :init
 	   (setq olivetti-body-width 90)
-	   (setq fill-column 80)
-	   (add-hook 'olivetti-mode-hook 'hamza/default-olivetti-resize))
+	   (setq fill-column 80))
 
 	 ;; (use-package org-drill
 	 ;;   :hook (org-mode . org-drill))
@@ -804,7 +800,6 @@
 
 	 ;; Drag-and-drop to `dired`
 	 (add-hook 'dired-mode-hook 'org-download-enable)
-	 (add-hook 'dired-mode-hook (lambda () (text-scale-increase 2)))
    #+end_src
 
 ** Dired
@@ -945,11 +940,6 @@
 	  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join) ; Use C-h as backspace
 	  (define-key evil-normal-state-map (kbd "u") 'undo-tree-undo)
 	  (define-key evil-normal-state-map (kbd "U") 'undo-tree-redo)
-
-	  (define-key evil-normal-state-map (kbd "H") 'evil-digit-argument-or-evil-beginning-of-line)
-	  (define-key evil-visual-state-map (kbd "H") 'evil-digit-argument-or-evil-beginning-of-line)
-	  (define-key evil-normal-state-map (kbd "L") 'evil-end-of-line)
-	  (define-key evil-visual-state-map (kbd "L") 'evil-end-of-line)
 
 	  ;; (define-key evil-normal-state-map (kbd "C-l o") 'org-open-at-point)
 	  ;; (define-key evil-normal-state-map (kbd "C-l b") 'org-mark-ring-goto)
@@ -1633,30 +1623,18 @@
 	 ;; 	(setq inferior-lisp-program "sbcl"))
 
 	 ;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-
-	 (use-package paredit
-	   :config
-	   (add-hook 'paredit-mode-hook #'evil-paredit-mode))
-
-	 (use-package evil-paredit)
-
-	 (use-package paredit-everywhere
-	   :config
-	   (add-hook 'prog-mode-hook 'paredit-everywhere-mode))
-
 	 (use-package sly
 	   :config
 	   (setq inferior-lisp-program "sbcl")
 	   ;; (add-hook 'sly-mode-hook 'set-up-sly-ac)
 	   ;; (eval-after-load 'auto-complete
 	   ;;   '(add-to-list 'ac-modes 'sly-mrepl-mode))
-	   ;; (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-	   ;; (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-	   ;; (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-	   ;; (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-	   ;; (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-	   ;; (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-	   )
+	   (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+	   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+	   (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+	   (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+	   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+	   (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
    #+end_src
 
 ** Hindent

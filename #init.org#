@@ -1,4 +1,4 @@
-#+TITLE: Groovemacs Org Config File
+/#+TITLE: Groovemacs Org Config File
 #+AUTHOR: Hamza Shahid
 #+STARTUP: overview
 #+PROPERTY: header-args:emacs-lisp :tangle ./org-init.el
@@ -1640,23 +1640,18 @@
 
 	 (use-package evil-paredit)
 
-	 (use-package paredit-everywhere
-	   :config
-	   (add-hook 'prog-mode-hook 'paredit-everywhere-mode))
-
 	 (use-package sly
 	   :config
 	   (setq inferior-lisp-program "sbcl")
 	   ;; (add-hook 'sly-mode-hook 'set-up-sly-ac)
 	   ;; (eval-after-load 'auto-complete
 	   ;;   '(add-to-list 'ac-modes 'sly-mrepl-mode))
-	   ;; (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-	   ;; (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-	   ;; (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-	   ;; (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-	   ;; (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-	   ;; (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-	   )
+	   (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+	   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+	   (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+	   (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+	   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+	   (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
    #+end_src
 
 ** Hindent
