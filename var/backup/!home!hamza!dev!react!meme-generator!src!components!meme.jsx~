@@ -1,0 +1,24 @@
+import React from "react";
+import Emoji from "../assets/framed-picture-emoji.png";
+import Data from "../memesData.js";
+
+function Meme() {
+  function getRandomMeme() {
+    const memes = Data.data.memes;
+    const randomIndex = (memes.length * Math.random()) << 0;
+    return memes[randomIndex].url;
+  }
+
+  return (
+    <div className="meme">
+      <input className="meme--input1" type="text" placeholder="Top text" />
+      <input className="meme--input2" type="text" placeholder="Bottom text" />
+      <button className="meme--button" onClick={getRandomMeme}>
+        Get a new meme image
+        <img className="meme--emoji" src={Emoji} />
+      </button>
+    </div>
+  );
+}
+
+export default Meme;

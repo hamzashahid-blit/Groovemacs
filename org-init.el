@@ -4,7 +4,7 @@
  fill-column 100              ; toggle wrapping text at the 80th character
  tab-width 4                  ; Set width for tabs
  delete-by-moving-to-trash t  ; Delete files to trash
- backup-directory-alist `(("." . "~/.saves"))
+ backup-directory-alist `(("." . "~/.saves")) ;; Save tmp file saves to ~/.saves
  ;; print a default message in the empty scratch buffer opened at startup
  initial-scratch-message ";; Welcome to Groovemacs!\n\n")
 
@@ -12,13 +12,14 @@
 (setq doom-modeline-icon t)
 	  ;doom-modeline-height 27)
 
-(tool-bar-mode -1)             ; Remove toolbar on top
-(menu-bar-mode -1)             ; Remove menubar below toolbar
-(tooltip-mode -1)              ; Remove tooltip (help on hover)
-(scroll-bar-mode -1)           ; Remove scrollbar
-(set-fringe-mode 10)           ; Give some breathing room
-(fset 'yes-or-no-p 'y-or-n-p)  ; Replace yes/no prompts with y/n
-(global-subword-mode 1)        ; Iterate through CamelCase words
+(tool-bar-mode -1)              ; Remove toolbar on top
+(menu-bar-mode -1)              ; Remove menubar below toolbar
+(tooltip-mode -1)               ; Remove tooltip (help on hover)
+(scroll-bar-mode -1)            ; Remove scrollbar
+(set-fringe-mode 10)            ; Give some breathing room
+(fset 'yes-or-no-p 'y-or-n-p)   ; Replace yes/no prompts with y/n
+(global-subword-mode 1)         ; Iterate through CamelCase words
+(setf frame-resize-pixelwise t) ; Remove annoying border in StumpWM & KDE
 
 ;; Make ESC quit prompts
 ;(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -56,6 +57,10 @@
 ;(my-frame-tweaks)
 ;(add-hook 'after-make-frame-functions #'my-frame-tweaks t)
 
+(add-hook 'server-after-make-frame-hook
+		  (lambda ()
+			(interactive)
+			(set-frame-parameter (selected-frame) 'alpha-background 0.9)))
 
 (add-to-list 'default-frame-alist '(font . "Mononoki-13"))
 (set-face-attribute 'default t :font "Mononoki-13")
@@ -197,6 +202,8 @@
 (use-package ranger
   :defer t)
 
+(use-package no-littering)
+
 ;; Create a variable for our preferred tab width
 (setq custom-tab-width 4)
 (setq custom-tab-width2 2)
@@ -257,6 +264,8 @@
 (use-package smart-tabs-mode
   :config
   (setq evil-indent-convert-tabs nil))
+
+;;(setq-default indent-tabs-mode nil)
 
 (use-package doom-themes
   :init (load-theme 'doom-gruvbox t))
@@ -560,52 +569,70 @@
 (use-package corfu
   ;; Optional customizations
   :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-  ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-  ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
-  ;; (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
-
-  ;; Optionally use TAB for cycling, default is `corfu-complete'.
-  :bind (:map corfu-map
-		 ("C-j" . corfu-next)
-		 ("TAB" . corfu-next)
-		 ([tab] . corfu-next)
-		 ("C-k" . corfu-previous)
-		 ("S-TAB" . corfu-previous)
-		 ([backtab] . corfu-previous))
-
-  ;; You may want to enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since dabbrev can be used globally (M-/).
-  :init
-  (corfu-global-mode))
-
-;; Dabbrev works with Corfu
-(use-package dabbrev
-  ;; Swap M-/ and C-M-/
-  :bind (("M-/" . dabbrev-completion)
-		 ("C-M-/" . dabbrev-expand)))
-
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
+  (corfu-cycle t)                 ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)                  ;; Enable auto completion
+  (corfu-commit-predicate t)      ;; Do not commit selected candidates on next input
+  (corfu-quit-at-boundary t)      ;; Automatically quit at word boundary
+  (corfu-quit-no-match t)         ;; Automatically quit if there is no match
+  (corfu-echo-documentation 0)    ;; if NIL, do not show documentation in the echo area
+  (corfu-auto-prefix 1)           ;; Run Corfu after 1 character is entered
+  (corfu-auto-delay 0)            ;; No delay before trying to auto-complete
+  (lsp-completion-provider :none) ;; Use corfu instead for lsp completions
+  (tab-always-indent 'complete)   ;; Enable indentation+completion using the TAB key.
 
   ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
   ;; (setq read-extended-command-predicate
   ;;       #'command-completion-default-include-p)
 
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  :bind (:map corfu-map
+		  ("C-j" . corfu-next)
+		  ("C-k" . corfu-previous)
+		  ("TAB" . corfu-next)
+		  ([tab] . corfu-next)
+		  ("S-TAB" . corfu-previous)
+		  ([backtab] . corfu-previous)
+		  ("<return>" . corfu-insert)
+		  ("C-<return>" .
+			(lambda ()
+			  (interactive)
+			  (corfu-quit)
+			  (newline 1 t)))
+		  ("M-d" . corfu-show-documentation)
+		  ("M-l" . corfu-show-location))
+
+  :init
+  ;; This is recommended since dabbrev can be used globally (M-/).
+  (global-corfu-mode))
+
+;; Cool VSCode icons beside autocompletions in LSP
+(use-package kind-icon
+  :after corfu
+  :custom
+  (kind-icon-use-icons t)                 ;; Use icons 
+  (kind-icon-default-face 'corfu-default) ;; Use corfu's background color
+  (kind-icon-blend-background t)          ;; Use overlay icons on background color
+  (kind-icon-blend-frac 0.12)             ;; Opacity of icon's background color from it's main color
+
+  ;; `kind-icon' depends on `svg-lib' which creates a cache directory
+  ;; that defaults to the `user-emacs-directory'.
+  ;; Here, I change that directory to a location appropriate to
+  ;; `no-littering' conventions, a package which moves directories
+  ;; of other packages to sane locations.
+  (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/"))
+  :config
+  ;; Enable kind-icon in corfu
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+  ;; TODO: This adds a hook to reset icon cache, setting correct background color 
+  ;; when I run the custom command for switching themes. (I haven't created this yet)
+  (add-hook 'hamza/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
+
+;; ;; Dabbrev works with Corfu
+;; (use-package dabbrev
+;;   ;; Swap M-/ and C-M-/
+;;   :bind (("M-/" . dabbrev-completion)
+;;          ("C-M-/" . dabbrev-expand)))
 
 (use-package doom-modeline
       :init (doom-modeline-mode 1))
@@ -1080,47 +1107,43 @@
 ;;   (meow-setup-line-number)
 ;;   (meow-setup-indicator))
 
-;; Cursors start
-(use-package multiple-cursors
-  :config
-  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+;; ;; Cursors start
+;; (use-package multiple-cursors
+;;   :config
+;;   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+;;   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+;;   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+;;   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
-(use-package visual-regexp-steroids
-  :config
-  (define-key global-map (kbd "C-c r") 'vr/replace)
-  (define-key global-map (kbd "C-c q") 'vr/query-replace)
+;; (use-package visual-regexp-steroids
+;;   :config
+;;   (define-key global-map (kbd "C-c r") 'vr/replace)
+;;   (define-key global-map (kbd "C-c q") 'vr/query-replace)
 
-  ;; to use visual-regexp-steroids's isearch instead of the built-in regexp isearch
-  ;(define-key esc-map (kbd "C-s") 'vr/isearch-forward) ;; C-M-s
-  ;(define-key esc-map (kbd "C-r") 'vr/isearch-backward)) ;; C-M-r
+;;   ;; to use visual-regexp-steroids's isearch instead of the built-in regexp isearch
+;;   ;(define-key esc-map (kbd "C-s") 'vr/isearch-forward) ;; C-M-s
+;;   ;(define-key esc-map (kbd "C-r") 'vr/isearch-backward)) ;; C-M-r
 
-  ;; if you use multiple-cursors, this is for you:
-  (define-key global-map (kbd "C-c m") 'vr/mc-mark))
+;;   ;; if you use multiple-cursors, this is for you:
+;;   (define-key global-map (kbd "C-c m") 'vr/mc-mark))
 
 (use-package evil-multiedit
   :after evil
   :config
-  (evil-multiedit-default-keybinds))
-
-;; (use-package evil-multiedit
-;; :after evil
-;; :config
-;; (setq evil-multiedit-follow-matches t))
-
-
+  (evil-multiedit-default-keybinds)
+  ;; (setq evil-multiedit-follow-matches t)
+  )
 
 ;; be in a state like when you press C-x C-+ and then just press +, - or 0
 (use-package hydra
   :defer 2
   :bind ("C-c c" . hydra-clock/body)
-		("C-c z" . hydra-mc/body)
-		("C-c r" . 'hydra-launcher/body))
+		("C-c z" . hydra-zoom/body)
+		("C-c r" . hydra-launcher/body)
+		("C-c w" . hydra-move-splitter/body))
 
 (defhydra hydra-zoom ()
-  "zoom"
+  "Zoom"
   ("k" text-scale-increase "in")
   ("j" text-scale-decrease "out"))
 
@@ -1139,6 +1162,13 @@
 		(windmove-find-other-window 'right))
 	  (shrink-window-horizontally arg)
 	(enlarge-window-horizontally arg)))
+
+(defhydra hydra-move-splitter ()
+  "Grow or shrink the current window"
+  ("h" evil-window-decrease-width "shrink width")
+  ("k" evil-window-decrease-height "shrink height")
+  ("j" evil-window-increase-height "grow height")
+  ("l" evil-window-increase-width "grow width"))
 
 (defhydra hydra-clock (:color blue)
 	"
@@ -1337,22 +1367,19 @@
 ;;   (vterm-directory-sync)
 ;;   (counsel-find-file))
 
-
-
-
-
 ;; Add ConTeXt to my Emacs Path so that eshell, term etc. could use them
 (add-to-list 'exec-path "/home/hamza/.src/context-linux/tex/texmf-linux/bin")
 
-(use-package pdf-tools
-  :config
-  (pdf-tools-install)
-  (setq-default pdf-view-display-size 'fit-page)
-  (setq pdf-annot-activate-created-annotations t)
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-  (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward)
-  (add-hook 'pdf-view-mode-hook (lambda ()
-								  (bms/pdf-midnite-amber)))) ; automatically turns on midnight-mode for pdfs
+;; Annoying to download so commenting for now
+;; (use-package pdf-tools
+;;   :config
+;;   (pdf-tools-install)
+;;   (setq-default pdf-view-display-size 'fit-page)
+;;   (setq pdf-annot-activate-created-annotations t)
+;;   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+;;   (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward)
+;;   (add-hook 'pdf-view-mode-hook (lambda ()
+;; 								  (bms/pdf-midnite-amber)))) ; automatically turns on midnight-mode for pdfs
 
 ;; (use-package auctex
 ;;   :defer t
@@ -1402,12 +1429,12 @@
 		(reftex-mode t)
 		(flyspell-mode t))))
 
-(use-package auto-complete
-  :diminish
-  :init
-  (require 'auto-complete-config)
-  :config
-  (ac-config-default))
+;; (use-package auto-complete
+;;   :diminish
+;;   :init
+;;   (require 'auto-complete-config)
+;;   :config
+;;   (ac-config-default))
 
 (use-package yasnippet-snippets)
 (use-package yasnippet
@@ -1420,6 +1447,27 @@
   ;; A bug fix for maybe a bug for macintosh
   ;(global-set-key (kbd "C-c ;") 'iedit)
   )
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook ((c-mode . lsp)
+		 (c++-mode . lsp)
+		 (html-mode . lsp)
+		 (css-mode . lsp)
+		 (rjsx-mode . lsp))
+  :init
+  (setq lsp-keymap-prefix "C-c l") ;; Or Space L
+  :config
+  (lsp-enable-which-key-integration t))
+
+;; TODOOOOO: Consult-LSP
+(setq gc-cons-threshold (* 100 1024 1024)
+	  read-process-output-max (* 1024 1024)
+	  treemacs-space-between-root-nodes nil
+	  company-idle-delay 0.0
+	  company-minimum-prefix-length 1
+	  lsp-idle-delay 0.1)  ;; clangd is fast
+
 
 ;; (use-package lsp-mode
 ;;   :commands (lsp lsp-deffered)
@@ -1451,8 +1499,8 @@
 ;; (use-package dap-haskell) ; to load the dap adapter for haskell
 
 ;; (use-package slime
-;; 	:config
-;; 	(setq inferior-lisp-program "sbcl"))
+;;   :config
+;;   (setq inferior-lisp-program "sbcl"))
 
 ;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 
@@ -1546,54 +1594,94 @@
   (add-hook 'gnu-apl-mode-hook 'em-gnu-apl-init))
 
 (use-package web-mode
-  ;; :defer t ;; Makes it not work
-  ;; File formats
-  :mode (("\\.html?\\'" . web-mode)
-	 ("\\.phtml\\'" . web-mode)
-	 ("\\.djhtml\\'" . web-mode)
-	 ("\\.css?\\'" . web-mode)
-	 ("\\.js\\'" . web-mode)
-	 ("\\.ts\\'" . web-mode)
-	 ("\\.tpl\\'" . web-mode)
-	 ("\\.[agj]sp\\'" . web-mode)
-	 ("\\.as[cp]x\\'" . web-mode)
-	 ("\\.erb\\'" . web-mode)
-	 ("\\.mustache\\'" . web-mode))
-  :config
+      ;; :defer t ;; Makes it not work
+      ;; File formats
+      :mode (("\\.html?\\'" . web-mode)
+		      ("\\.phtml\\'" . web-mode)
+		      ("\\.djhtml\\'" . web-mode)
+		      ("\\.css?\\'" . web-mode)
+		      ("\\.ts\\'" . web-mode)
+		      ("\\.tpl\\'" . web-mode)
+		      ("\\.[agj]sp\\'" . web-mode)
+		      ("\\.as[cp]x\\'" . web-mode)
+		      ("\\.erb\\'" . web-mode)
+		      ("\\.mustache\\'" . web-mode))
+      :config
+      ;; Hooks
+      ;; (add-hook 'html-mode-hook 'web-mode)
+      ;; (add-hook 'css-mode-hook 'web-mode)
+      ;; (add-hook 'js-mode-hook 'web-mode)
+      ;; (add-hook 'sgml-mode-hook 'web-mode)
 
-  ;; Hooks
-  ;; (add-hook 'html-mode-hook 'web-mode)
-  ;; (add-hook 'css-mode-hook 'web-mode)
-  ;; (add-hook 'js-mode-hook'web-mode)
-  ;; (add-hook 'sgml-mode-hook 'web-mode)
+      ;; Enable JSX syntax highlighting in .js/.jsx files
+      ;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
-  ;; Indentation
-  (setq web-mode-markup-indent-offset 4)
-  (setq web-mode-css-indent-offset 4)
-  (setq web-mode-code-indent-offset 4)
-  (setq web-mode-attr-indent-offset 4)
+      ;; Indentation
+      (setq web-mode-markup-indent-offset 2)
+      (setq web-mode-css-indent-offset 2)
+      (setq web-mode-code-indent-offset 2)
+      (setq web-mode-attr-indent-offset 2)
 
-  ;; Features
-  (setq web-mode-enable-auto-pairing 1)
-  ;; (setq web-mode-enable-css-colorization 1)
-  ;; (setq web-mode-enable-current-element-highlight 1)
-  (setq web-mode-enable-auto-closing 1)
+      ;; Features
+      (setq web-mode-enable-auto-pairing 1)
+      ;; (setq web-mode-enable-css-colorization 1)
+      ;; (setq web-mode-enable-current-element-highlight 1)
+      (setq web-mode-enable-auto-closing 1)
 
-  ;; Auto-complete
-  (setq web-mode-ac-sources-alist
-  '(("css" . (ac-source-css-property))
-    ("html" . (ac-source-words-in-buffer ac-source-abbrev)))))
+      ;; Auto-complete
+      ;; Disable the default flycheck jslint:
+      ;; (setq-default flycheck-disabled-checkers
+      ;;   (append flycheck-disabled-checkers
+      ;;     '(javascript-jshint json-jsonlist)))
+
+      (setq web-mode-ac-sources-alist
+	'(("css" . (ac-source-css-property))
+	      ("html" . (ac-source-words-in-buffer ac-source-abbrev))))
+
+      ;; Enable prettier-js-mode for files in a project with prettier (this will use the projects .prettierrc)
+      (add-node-modules-path)
+      (prettier-js-mode)
+      (rjsx-mode))
 
 (use-package emmet-mode
-  ;; :defer t ;; Makes it not work
-  ;; useless automatically works
-  ;; :bind (("<C-return>" . hamza/emmet-tab)
-  ;;        ("C-j" . emmet-expand-line))
-  :config
-  (add-hook 'web-mode-hook 'emmet-mode))
+      ;; :defer t ;; Makes it not work
+      ;; useless automatically works
+      ;; :bind (("<C-return>" . hamza/emmet-tab)
+      ;;        ("C-j" . emmet-expand-line))
+      :hook web-mode)
 
-(use-package js2-mode
-  :defer t)
+;; (add-hook 'js2-mode-hook 'skewer-mode)
+;; (add-hook 'css-mode-hook 'skewer-css-mode)
+;; (add-hook 'html-mode-hook 'skewer-html-mode)
+
+(use-package skewer-mode
+      :hook ((js2-mode . skewer-mode)
+		 (css-mode . skewer-css-mode)
+		 (html-mode . skewer-html-mode)))
+
+(use-package impatient-mode
+      :hook web-mode)
+
+;; (use-package flycheck-mode
+;;   :hook web-mode
+;;   :config
+;;   ;; Enable eslint checker for web-mode
+;;   (flycheck-add-mode 'javascript-eslint 'web-mode))
+
+;; (use-package add-node-modules-path
+;;   :hook flycheck-mode)
+
+;; (use-package js2-mode
+;;   :hook web-mode)
+
+(use-package rjsx-mode
+      :mode (("\\.jsx?$" . rjsx-mode))
+      :config
+      (setf tab-width 4
+		js-indent-level 2))
+
+(use-package prettier-js
+      :hook (rjsx-mode . prettier-js-mode))
 
 ;; (defun hamza/ac-c-header-init ()
 ;;   (require 'auto-complete-c-headers)
@@ -1652,160 +1740,172 @@
 ;;   (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the
 
 (defun hamza/insert-line-below ()
-    "Insert an empty line below the current line."
-    (interactive)
-    (save-excursion
-  (end-of-line)
-  (open-line 1)))
+  "Insert an empty line below the current line."
+  (interactive)
+  (save-excursion
+(end-of-line)
+(open-line 1)))
 
-  (defun hamza/insert-line-above ()
-    "insert an empty line above the current line."
-    (interactive)
-    (save-excursion
-  (end-of-line 0)
-  (open-line 1)))
+(defun hamza/insert-line-above ()
+  "insert an empty line above the current line."
+  (interactive)
+  (save-excursion
+(end-of-line 0)
+(open-line 1)))
 
-  (defun hamza/remove-line-below ()
-    "Remove the line below the current line."
-    (interactive)
-    (save-excursion
-  (next-line)
-  (kill-whole-line)))
+(defun hamza/remove-line-below ()
+  "Remove the line below the current line."
+  (interactive)
+  (save-excursion
+(next-line)
+(kill-whole-line)))
 
-  (defun hamza/remove-line-above ()
-    "Remove the line above the current line."
-    (interactive)
-    (save-excursion
-  (previous-line)
-  (kill-whole-line)))
+(defun hamza/remove-line-above ()
+  "Remove the line above the current line."
+  (interactive)
+  (save-excursion
+(previous-line)
+(kill-whole-line)))
 
-  (defun hamza/insert-and-goto-line-below ()
-    "Insert a line below the current line and move to it"
-    (interactive)
-    (save-excursion
-  (end-of-line)
-  (open-line 1)))
+(defun hamza/insert-and-goto-line-below ()
+  "Insert a line below the current line and move to it"
+  (interactive)
+  (save-excursion
+(end-of-line)
+(open-line 1)))
 
-  (defun hamza/insert-and-goto-line-above ()
-    "Insert a line above the current line and move to it"
-    (interactive)
-    (save-excursion
-  (end-of-line)
-  (open-line 1)))
+(defun hamza/insert-and-goto-line-above ()
+  "Insert a line above the current line and move to it"
+  (interactive)
+  (save-excursion
+(end-of-line)
+(open-line 1)))
 
-  (defun hamza/download-url (url path)
-    "Downloads a file from a URL.
-  Argument PATH Where to save on your computer."
-    (interactive "MPlease Enter URL: \nFPlease Enter the File to Save to: ")
-    (url-copy-file url path))
+(defun hamza/download-url (url path)
+  "Downloads a file from a URL.
+Argument PATH Where to save on your computer."
+  (interactive "MPlease Enter URL: \nFPlease Enter the File to Save to: ")
+  (url-copy-file url path))
 
-  ;; Open Image in another program
-  (defun hamza/open-image-externally (x)
-    "Takes an image and opens in GIMP or any other external program.
-  Argument X The image file path."
-    (interactive "FPlease Enter an Image: ")
-    ;;(start-process "" nil "xfce4-terminal"))
-    (shell-command (concat "gimp " x)))
+;; Open Image in another program
+(defun hamza/open-image-externally (x)
+  "Takes an image and opens in GIMP or any other external program.
+Argument X The image file path."
+  (interactive "FPlease Enter an Image: ")
+  ;;(start-process "" nil "xfce4-terminal"))
+  (shell-command (concat "gimp " x)))
 
-  ;; Helper for compilation. Close the compilation window if
-  ;; there was no error at all. (emacs wiki)
-  (defun hamza/compilation-exit-autoclose (status code msg)
-    "If <M-x> compile exists with a 0 then bury the *compilation* buffer, so that C-x b doesn't go there and delete the *compilation* window."
-    (when (and (eq status 'exit) (zerop code))
-  (bury-buffer)
-  (delete-window (get-buffer-window (get-buffer "*compilation*"))))
-    ;; Always return the anticipated result of compilation-exit-message-function
-    (cons msg code))
+;; Helper for compilation. Close the compilation window if
+;; there was no error at all. (emacs wiki)
+(defun hamza/compilation-exit-autoclose (status code msg)
+  "If <M-x> compile exists with a 0 then bury the *compilation* buffer, so that C-x b doesn't go there and delete the *compilation* window."
+  (when (and (eq status 'exit) (zerop code))
+(bury-buffer)
+(delete-window (get-buffer-window (get-buffer "*compilation*"))))
+  ;; Always return the anticipated result of compilation-exit-message-function
+  (cons msg code))
 
-  ;; Specify my function (maybe I should have done a lambda function)
-  (setq compilation-exit-message-function 'hamza/compilation-exit-autoclose)
+;; Specify my function (maybe I should have done a lambda function)
+(setq compilation-exit-message-function 'hamza/compilation-exit-autoclose)
 
-  (defun hamza/align-comments-// (beginning end)
-    "Align instances of // within marked region."
-    (interactive "*r")
-    (let (indent-tabs-mode align-to-tab-stop)
-  (align-regexp beginning end "\\(\\s-*\\)//")))
+(defun hamza/align-comments-// (beginning end)
+  "Align instances of // within marked region."
+  (interactive "*r")
+  (let (indent-tabs-mode align-to-tab-stop)
+(align-regexp beginning end "\\(\\s-*\\)//")))
 
-  (defun hamza/align-comments-\;\; (beginning end)
-    "Align instances of // within marked region."
-    (interactive "*r")
-    (let (indent-tabs-mode align-to-tab-stop)
-  (align-regexp beginning end "\\(\\s-*\\);;")))
+(defun hamza/align-comments-\;\; (beginning end)
+  "Align instances of // within marked region."
+  (interactive "*r")
+  (let (indent-tabs-mode align-to-tab-stop)
+(align-regexp beginning end "\\(\\s-*\\);;")))
 
-  (defun hamza/align-comments-// (beginning end)
-    "Align instances of // within marked region."
-    (interactive "*r")
-    (let (indent-tabs-mode align-to-tab-stop)
-  (align-regexp beginning end "\\(\\s-*\\)//")))
+(defun hamza/align-comments-// (beginning end)
+  "Align instances of // within marked region."
+  (interactive "*r")
+  (let (indent-tabs-mode align-to-tab-stop)
+(align-regexp beginning end "\\(\\s-*\\)//")))
 
-  (defun hamza/olivetti-resize (size)
-    (interactive "NPlease Enter the width: ")
-    (setq olivetti-body-width size)
-    (setq fill-column size))
+(defun hamza/olivetti-resize (size)
+  (interactive "NPlease Enter the width: ")
+  (setq olivetti-body-width size)
+  (setq fill-column size))
 
-  (defun hamza/default-olivetti-resize ()
-    (interactive)
-    (setq olivetti-body-width 90)
-    (setq fill-column 80))
+(defun hamza/default-olivetti-resize ()
+  (interactive)
+  (setq olivetti-body-width 90)
+  (setq fill-column 80))
 
-  ;; (defun hamza/get-auto-fill-paragraph ()
-  ;;   ;; (move-beginning-of-line)
-  ;;   ;; (move-end-of-line)
-  ;;   ;; (forward-char)
-  ;;   ;; (move-beginning-of-line)
-  ;;   ;; (line-number-at-pos)
-  ;;   ;; (current-column)
-  ;;   ;; (while (> (point) (end-of-line)
+;; (defun hamza/get-auto-fill-paragraph ()
+;;   ;; (move-beginning-of-line)
+;;   ;; (move-end-of-line)
+;;   ;; (forward-char)
+;;   ;; (move-beginning-of-line)
+;;   ;; (line-number-at-pos)
+;;   ;; (current-column)
+;;   ;; (while (> (point) (end-of-line)
 
-  ;;   (interactive)
+;;   (interactive)
 
-  ;;   ;; How many chars in a line
-  ;;   (setq original-pos (point))
-  ;;   (move-end-of-line 1)
-  ;;   (setq chars-in-line (- (current-column) 1))
+;;   ;; How many chars in a line
+;;   (setq original-pos (point))
+;;   (move-end-of-line 1)
+;;   (setq chars-in-line (- (current-column) 1))
 
-  ;;   ;(setq lines-in-buffer)
-  ;;   ;;(when (  ))
-  ;;   (if (>= chars-in-line fill-column)
-  ;; 	  (progn
-  ;; 		(fill-paragraph)
-  ;; 		(forward-line 1)))
-  ;;   (goto-char original-pos))
+;;   ;(setq lines-in-buffer)
+;;   ;;(when (  ))
+;;   (if (>= chars-in-line fill-column)
+;; 	  (progn
+;; 		(fill-paragraph)
+;; 		(forward-line 1)))
+;;   (goto-char original-pos))
 
-  (defun hamza/flyspell-save-word (bool)
-    (interactive (list (y-or-n-p (concat "Do you want to save the current word, \"" (word-at-point) "\""))))
-    (if bool
-    (let ((current-location (point))
-	   (word (flyspell-get-word)))
-  (when (consp word)
-    (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location)))))
+(defun hamza/flyspell-save-word (bool)
+  (interactive (list (y-or-n-p (concat "Do you want to save the current word, \"" (word-at-point) "\""))))
+  (if bool
+  (let ((current-location (point))
+	 (word (flyspell-get-word)))
+(when (consp word)
+  (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location)))))
 
-  ;; (defun hamza/do-the-thing? (bool)
-  ;;   (setq ungabunga "mission assasinate")
-  ;;
-  ;;   ;;(y-or-n-p (concat "Do you want to do it?" ungabunga))))
-  ;;   ;;(interactive (list (read-string "dope right? ")
-  ;;   ;;  				   (y-or-n-p "Do you want to do it?")))
-  ;;
-  ;;   (interactive (list (y-or-n-p (concat "Do you want to do it? \"" (word-at-point) "\""))))
-  ;;
-  ;;   (if bool (message "Here is your ungabunga: %s" ungabunga)))
-  ;;
+;; (defun hamza/do-the-thing? (bool)
+;;   (setq ungabunga "mission assasinate")
+;;
+;;   ;;(y-or-n-p (concat "Do you want to do it?" ungabunga))))
+;;   ;;(interactive (list (read-string "dope right? ")
+;;   ;;  				   (y-or-n-p "Do you want to do it?")))
+;;
+;;   (interactive (list (y-or-n-p (concat "Do you want to do it? \"" (word-at-point) "\""))))
+;;
+;;   (if bool (message "Here is your ungabunga: %s" ungabunga)))
+;;
 
-  ;; Useless automatically indents
+;; Useless automatically indents
 
-  ;; (defun hamza/emmet-tab ()
-  ;;   (interactive)
-  ;;   (if (looking-at "\\_>")
-  ;;       (emmet-expand-line nil)
-  ;;     (indent-according-to-mode)))
+;; (defun hamza/emmet-tab ()
+;;   (interactive)
+;;   (if (looking-at "\\_>")
+;;       (emmet-expand-line nil)
+;;     (indent-according-to-mode)))
 
-  (defun hamza/reload-config ()
-(interactive)
-    (setq my-org-config-file (concat user-emacs-directory "init.org"))
-    (setq my-config-file (concat user-emacs-directory "org-init.el"))
-    (org-babel-tangle-file my-org-config-file)
-    (load-file my-config-file))
+(defun hamza/reload-config ()
+  (interactive)
+  (setq my-org-config-file (concat user-emacs-directory "init.org"))
+  (setq my-config-file (concat user-emacs-directory "org-init.el"))
+  (org-babel-tangle-file my-org-config-file)
+  (load-file my-config-file))
+
+(defun hamza/clear-the-clutter ()
+  (interactive)
+  ;; (message "%s"
+  ;;   (mapcar 'buffer-name
+  ;;     (buffer-list)))
+  (mapc (lambda (buffer)
+		  (let ((buf-name (buffer-name buffer)))
+			(unless (or (string= buf-name "*scratch*")
+						(string= buf-name "*Messages*"))
+			  (kill-buffer buffer))))
+		(buffer-list)))
 
 (global-set-key (kbd "M-j") 'hamza/insert-line-below)
 (global-set-key (kbd "M-k") 'hamza/insert-line-above)
@@ -1862,10 +1962,11 @@
    "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
    ;; Config Files
    "fc" '(:ignore t :which-key "Configuration Files")
-   "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
+   "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.org")) :which-key "Emacs config")
    "fcw" '(:ignore t :which-key "WM Config Files")
    "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
    "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
+   "fcws" '((lambda () (interactive)(find-file "~/.stumpwm.d/init.lisp")) :which-key "StumpWM Config")
 
    ;;; Code
    "c" '(:ignore t :which-key "Code")

@@ -4,8 +4,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ./org-init.el
 
 * TODO Create install script
-
-
+* TODO adding "=" should act as literal word in vertico/embarks/consult/whatever
 
 * Basic Tweaks
   #+begin_src emacs-lisp
@@ -15,7 +14,7 @@
 	 fill-column 100              ; toggle wrapping text at the 80th character
 	 tab-width 4                  ; Set width for tabs
 	 delete-by-moving-to-trash t  ; Delete files to trash
-	 backup-directory-alist `(("." . "~/.saves"))
+	 backup-directory-alist `(("." . "~/.saves")) ;; Save tmp file saves to ~/.saves
 	 ;; print a default message in the empty scratch buffer opened at startup
 	 initial-scratch-message ";; Welcome to Groovemacs!\n\n")
 
@@ -23,13 +22,14 @@
 	(setq doom-modeline-icon t)
 		  ;doom-modeline-height 27)
 
-	(tool-bar-mode -1)             ; Remove toolbar on top
-	(menu-bar-mode -1)             ; Remove menubar below toolbar
-	(tooltip-mode -1)              ; Remove tooltip (help on hover)
-	(scroll-bar-mode -1)           ; Remove scrollbar
-	(set-fringe-mode 10)           ; Give some breathing room
-	(fset 'yes-or-no-p 'y-or-n-p)  ; Replace yes/no prompts with y/n
-	(global-subword-mode 1)        ; Iterate through CamelCase words
+	(tool-bar-mode -1)              ; Remove toolbar on top
+	(menu-bar-mode -1)              ; Remove menubar below toolbar
+	(tooltip-mode -1)               ; Remove tooltip (help on hover)
+	(scroll-bar-mode -1)            ; Remove scrollbar
+	(set-fringe-mode 10)            ; Give some breathing room
+	(fset 'yes-or-no-p 'y-or-n-p)   ; Replace yes/no prompts with y/n
+	(global-subword-mode 1)         ; Iterate through CamelCase words
+	(setf frame-resize-pixelwise t) ; Remove annoying border in StumpWM & KDE
 
 	;; Make ESC quit prompts
 	;(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -42,7 +42,7 @@
 		(garbage-collect))))
  #+end_src
 
-* Font
+* Font & Other Appearance
   #+begin_src emacs-lisp
 	;; TODO: Which-key gets covered up with minibuffer if font size is 13 or above
 
@@ -70,6 +70,10 @@
 	;(my-frame-tweaks)
 	;(add-hook 'after-make-frame-functions #'my-frame-tweaks t)
 
+	(add-hook 'server-after-make-frame-hook
+			  (lambda ()
+				(interactive)
+				(set-frame-parameter (selected-frame) 'alpha-background 0.9)))
 
 	(add-to-list 'default-frame-alist '(font . "Mononoki-13"))
 	(set-face-attribute 'default t :font "Mononoki-13")
@@ -222,6 +226,8 @@
 
 	(use-package ranger
 	  :defer t)
+
+	(use-package no-littering)
  #+end_src
 
 * Indenting
@@ -286,6 +292,8 @@
 	(use-package smart-tabs-mode
 	  :config
 	  (setq evil-indent-convert-tabs nil))
+
+	;;(setq-default indent-tabs-mode nil)
   #+end_src
 
 * Theme
@@ -616,52 +624,79 @@
 	(use-package corfu
 	  ;; Optional customizations
 	  :custom
-	  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-	  (corfu-auto t)                 ;; Enable auto completion
-	  ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-	  ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-	  ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
-	  ;; (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
-
-	  ;; Optionally use TAB for cycling, default is `corfu-complete'.
-	  :bind (:map corfu-map
-			 ("C-j" . corfu-next)
-			 ("TAB" . corfu-next)
-			 ([tab] . corfu-next)
-			 ("C-k" . corfu-previous)
-			 ("S-TAB" . corfu-previous)
-			 ([backtab] . corfu-previous))
-
-	  ;; You may want to enable Corfu only for certain modes.
-	  ;; :hook ((prog-mode . corfu-mode)
-	  ;;        (shell-mode . corfu-mode)
-	  ;;        (eshell-mode . corfu-mode))
-
-	  ;; Recommended: Enable Corfu globally.
-	  ;; This is recommended since dabbrev can be used globally (M-/).
-	  :init
-	  (corfu-global-mode))
-
-	;; Dabbrev works with Corfu
-	(use-package dabbrev
-	  ;; Swap M-/ and C-M-/
-	  :bind (("M-/" . dabbrev-completion)
-			 ("C-M-/" . dabbrev-expand)))
-
-	;; A few more useful configurations...
-	(use-package emacs
-	  :init
-	  ;; TAB cycle if there are only few candidates
-	  (setq completion-cycle-threshold 3)
+	  (corfu-cycle t)                 ;; Enable cycling for `corfu-next/previous'
+	  (corfu-auto t)                  ;; Enable auto completion
+	  (corfu-commit-predicate t)      ;; Do not commit selected candidates on next input
+	  (corfu-quit-at-boundary t)      ;; Automatically quit at word boundary
+	  (corfu-quit-no-match t)         ;; Automatically quit if there is no match
+	  (corfu-echo-documentation 0)    ;; if NIL, do not show documentation in the echo area
+	  (corfu-auto-prefix 1)           ;; Run Corfu after 1 character is entered
+	  (corfu-auto-delay 0)            ;; No delay before trying to auto-complete
+	  (lsp-completion-provider :none) ;; Use corfu instead for lsp completions
+	  (tab-always-indent 'complete)   ;; Enable indentation+completion using the TAB key.
 
 	  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
 	  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
 	  ;; (setq read-extended-command-predicate
 	  ;;       #'command-completion-default-include-p)
 
-	  ;; Enable indentation+completion using the TAB key.
-	  ;; `completion-at-point' is often bound to M-TAB.
-	  (setq tab-always-indent 'complete))
+	  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+	  :bind (:map corfu-map
+			  ("C-j" . corfu-next)
+			  ("C-k" . corfu-previous)
+			  ("TAB" . corfu-next)
+			  ([tab] . corfu-next)
+			  ("S-TAB" . corfu-previous)
+			  ([backtab] . corfu-previous)
+			  ("<return>" . corfu-insert)
+			  ("C-<return>" .
+				(lambda ()
+				  (interactive)
+				  (corfu-quit)
+				  (newline 1 t)))
+			  ;; ("M-d" . corfu-show-documentation) ;; corfu-doc already handles this
+			  ("M-l" . corfu-show-location))
+
+	  :init
+	  ;; This is recommended since dabbrev can be used globally (M-/).
+	  (global-corfu-mode))
+
+	;; ;; Dabbrev works with Corfu
+	;; (use-package dabbrev
+	;;   ;; Swap M-/ and C-M-/
+	;;   :bind (("M-/" . dabbrev-completion)
+	;;          ("C-M-/" . dabbrev-expand)))
+
+	;; Cool VSCode icons beside autocompletions in LSP
+	(use-package kind-icon
+	  :after corfu
+	  :custom
+	  (kind-icon-use-icons t)                 ;; Use icons 
+	  (kind-icon-default-face 'corfu-default) ;; Use corfu's background color
+	  (kind-icon-blend-background t)          ;; Use overlay icons on background color
+	  (kind-icon-blend-frac 0.12)             ;; Opacity of icon's background color from it's main color
+
+	  ;; `kind-icon' depends on `svg-lib' which creates a cache directory
+	  ;; that defaults to the `user-emacs-directory'.
+	  ;; Here, I change that directory to a location appropriate to
+	  ;; `no-littering' conventions, a package which moves directories
+	  ;; of other packages to sane locations.
+	  (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/"))
+	  :config
+	  ;; Enable kind-icon in corfu
+	  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+	  ;; TODO: This adds a hook to reset icon cache, setting correct background color 
+	  ;; when I run the custom command for switching themes. (I haven't created this yet)
+	  (add-hook 'hamza/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
+
+	(use-package corfu-doc
+	  :hook (corfu . corfu-doc-mode)
+	  :bind (:map corfu-map
+			  ;; ("M-d" . corfu-doc-toggle)
+			  ("M-j" . corfu-doc-scroll-up)
+			  ("M-k" . corfu-doc-scroll-down))
+	  :config
+	  (corfu-doc-mode))
   #+end_src
 
 * Modeline
@@ -1226,35 +1261,32 @@
 
 * Cursors
   #+begin_src emacs-lisp
-	;; Cursors start
-	(use-package multiple-cursors
-	  :config
-	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+	;; ;; Cursors start
+	;; (use-package multiple-cursors
+	;;   :config
+	;;   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+	;;   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+	;;   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+	;;   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
-	(use-package visual-regexp-steroids
-	  :config
-	  (define-key global-map (kbd "C-c r") 'vr/replace)
-	  (define-key global-map (kbd "C-c q") 'vr/query-replace)
+	;; (use-package visual-regexp-steroids
+	;;   :config
+	;;   (define-key global-map (kbd "C-c r") 'vr/replace)
+	;;   (define-key global-map (kbd "C-c q") 'vr/query-replace)
 
-	  ;; to use visual-regexp-steroids's isearch instead of the built-in regexp isearch
-	  ;(define-key esc-map (kbd "C-s") 'vr/isearch-forward) ;; C-M-s
-	  ;(define-key esc-map (kbd "C-r") 'vr/isearch-backward)) ;; C-M-r
+	;;   ;; to use visual-regexp-steroids's isearch instead of the built-in regexp isearch
+	;;   ;(define-key esc-map (kbd "C-s") 'vr/isearch-forward) ;; C-M-s
+	;;   ;(define-key esc-map (kbd "C-r") 'vr/isearch-backward)) ;; C-M-r
 
-	  ;; if you use multiple-cursors, this is for you:
-	  (define-key global-map (kbd "C-c m") 'vr/mc-mark))
+	;;   ;; if you use multiple-cursors, this is for you:
+	;;   (define-key global-map (kbd "C-c m") 'vr/mc-mark))
 
 	(use-package evil-multiedit
 	  :after evil
 	  :config
-	  (evil-multiedit-default-keybinds))
-
-	;; (use-package evil-multiedit
-	;; :after evil
-	;; :config
-	;; (setq evil-multiedit-follow-matches t))
+	  (evil-multiedit-default-keybinds)
+	  ;; (setq evil-multiedit-follow-matches t)
+	  )
   #+end_src
 
   #+RESULTS:
@@ -1262,18 +1294,16 @@
 
 * Hydra
   #+begin_src emacs-lisp
-
-  #+end_src
-  #+begin_src emacs-lisp
 	;; be in a state like when you press C-x C-+ and then just press +, - or 0
 	(use-package hydra
 	  :defer 2
 	  :bind ("C-c c" . hydra-clock/body)
-			("C-c z" . hydra-mc/body)
-			("C-c r" . 'hydra-launcher/body))
+			("C-c z" . hydra-zoom/body)
+			("C-c r" . hydra-launcher/body)
+			("C-c w" . hydra-move-splitter/body))
 
 	(defhydra hydra-zoom ()
-	  "zoom"
+	  "Zoom"
 	  ("k" text-scale-increase "in")
 	  ("j" text-scale-decrease "out"))
 
@@ -1292,6 +1322,13 @@
 			(windmove-find-other-window 'right))
 		  (shrink-window-horizontally arg)
 		(enlarge-window-horizontally arg)))
+
+	(defhydra hydra-move-splitter ()
+	  "Resize the current window"
+	  ("h" evil-window-decrease-width "shrink width")
+	  ("k" evil-window-decrease-height "shrink height")
+	  ("j" evil-window-increase-height "grow height")
+	  ("l" evil-window-increase-width "grow width"))
 
 	(defhydra hydra-clock (:color blue)
 		"
@@ -1496,24 +1533,19 @@
 
 * Tex
   #+begin_src emacs-lisp
-
-  #+end_src
-  #+begin_src emacs-lisp
-
-  #+end_src
-  #+begin_src emacs-lisp
 	;; Add ConTeXt to my Emacs Path so that eshell, term etc. could use them
 	(add-to-list 'exec-path "/home/hamza/.src/context-linux/tex/texmf-linux/bin")
 
-	(use-package pdf-tools
-	  :config
-	  (pdf-tools-install)
-	  (setq-default pdf-view-display-size 'fit-page)
-	  (setq pdf-annot-activate-created-annotations t)
-	  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-	  (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward)
-	  (add-hook 'pdf-view-mode-hook (lambda ()
-									  (bms/pdf-midnite-amber)))) ; automatically turns on midnight-mode for pdfs
+	;; Annoying to download so commenting for now
+	;; (use-package pdf-tools
+	;;   :config
+	;;   (pdf-tools-install)
+	;;   (setq-default pdf-view-display-size 'fit-page)
+	;;   (setq pdf-annot-activate-created-annotations t)
+	;;   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+	;;   (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward)
+	;;   (add-hook 'pdf-view-mode-hook (lambda ()
+	;; 								  (bms/pdf-midnite-amber)))) ; automatically turns on midnight-mode for pdfs
 
 	;; (use-package auctex
 	;;   :defer t
@@ -1568,12 +1600,12 @@
 * Programming
 ** Auto Complete
    #+begin_src emacs-lisp
-	 (use-package auto-complete
-	   :diminish
-	   :init
-	   (require 'auto-complete-config)
-	   :config
-	   (ac-config-default))
+	 ;; (use-package auto-complete
+	 ;;   :diminish
+	 ;;   :init
+	 ;;   (require 'auto-complete-config)
+	 ;;   :config
+	 ;;   (ac-config-default))
    #+end_src
 
 ** Snippets
@@ -1594,8 +1626,29 @@
 	   )
    #+end_src
 
-** LSP [Disabled]
+** LSP
    #+begin_src emacs-lisp
+	 (use-package lsp-mode
+	   :commands (lsp lsp-deferred)
+	   :hook ((c-mode . lsp)
+			  (c++-mode . lsp)
+			  (html-mode . lsp)
+			  (css-mode . lsp)
+			  (rjsx-mode . lsp))
+	   :init
+	   (setq lsp-keymap-prefix "C-c l") ;; Or Space L
+	   :config
+	   (lsp-enable-which-key-integration t))
+
+	 ;; TODOOOOO: Consult-LSP
+	 (setq gc-cons-threshold (* 100 1024 1024)
+		   read-process-output-max (* 1024 1024)
+		   treemacs-space-between-root-nodes nil
+		   company-idle-delay 0.0
+		   company-minimum-prefix-length 1
+		   lsp-idle-delay 0.1)  ;; clangd is fast
+
+
 	 ;; (use-package lsp-mode
 	 ;;   :commands (lsp lsp-deffered)
 	 ;;   :init
@@ -1629,8 +1682,8 @@
 ** Lisp
    #+begin_src emacs-lisp
 	 ;; (use-package slime
-	 ;; 	:config
-	 ;; 	(setq inferior-lisp-program "sbcl"))
+	 ;;   :config
+	 ;;   (setq inferior-lisp-program "sbcl"))
 
 	 ;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 
@@ -1664,6 +1717,7 @@
 	 (use-package hindent
 	   :defer t)
    #+end_src
+
 ** Haskell
    #+begin_src emacs-lisp
 	 (use-package haskell-mode
@@ -1700,6 +1754,7 @@
 	 ;;   :config
 	 ;;   (message "Loaded lsp-haskell"))
    #+end_src
+
 ** Other Languages
 *** Lua
 	#+begin_src emacs-lisp
@@ -1743,55 +1798,95 @@
 	#+end_src
 *** Web Dev
     #+begin_src emacs-lisp
-      (use-package web-mode
-	;; :defer t ;; Makes it not work
-	;; File formats
-	:mode (("\\.html?\\'" . web-mode)
-	       ("\\.phtml\\'" . web-mode)
-	       ("\\.djhtml\\'" . web-mode)
-	       ("\\.css?\\'" . web-mode)
-	       ("\\.js\\'" . web-mode)
-	       ("\\.ts\\'" . web-mode)
-	       ("\\.tpl\\'" . web-mode)
-	       ("\\.[agj]sp\\'" . web-mode)
-	       ("\\.as[cp]x\\'" . web-mode)
-	       ("\\.erb\\'" . web-mode)
-	       ("\\.mustache\\'" . web-mode))
-	:config
+	  (use-package web-mode
+		;; :defer t ;; Makes it not work
+		;; File formats
+		:mode (("\\.html?\\'" . web-mode)
+				("\\.phtml\\'" . web-mode)
+				("\\.djhtml\\'" . web-mode)
+				("\\.css?\\'" . web-mode)
+				("\\.ts\\'" . web-mode)
+				("\\.tpl\\'" . web-mode)
+				("\\.[agj]sp\\'" . web-mode)
+				("\\.as[cp]x\\'" . web-mode)
+				("\\.erb\\'" . web-mode)
+				("\\.mustache\\'" . web-mode))
+		:config
+		;; Hooks
+		;; (add-hook 'html-mode-hook 'web-mode)
+		;; (add-hook 'css-mode-hook 'web-mode)
+		;; (add-hook 'js-mode-hook 'web-mode)
+		;; (add-hook 'sgml-mode-hook 'web-mode)
 
-	;; Hooks
-	;; (add-hook 'html-mode-hook 'web-mode)
-	;; (add-hook 'css-mode-hook 'web-mode)
-	;; (add-hook 'js-mode-hook'web-mode)
-	;; (add-hook 'sgml-mode-hook 'web-mode)
+		;; Enable JSX syntax highlighting in .js/.jsx files
+		;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
-	;; Indentation
-	(setq web-mode-markup-indent-offset 4)
-	(setq web-mode-css-indent-offset 4)
-	(setq web-mode-code-indent-offset 4)
-	(setq web-mode-attr-indent-offset 4)
+		;; Indentation
+		(setq web-mode-markup-indent-offset 2)
+		(setq web-mode-css-indent-offset 2)
+		(setq web-mode-code-indent-offset 2)
+		(setq web-mode-attr-indent-offset 2)
 
-	;; Features
-	(setq web-mode-enable-auto-pairing 1)
-	;; (setq web-mode-enable-css-colorization 1)
-	;; (setq web-mode-enable-current-element-highlight 1)
-	(setq web-mode-enable-auto-closing 1)
+		;; Features
+		(setq web-mode-enable-auto-pairing 1)
+		;; (setq web-mode-enable-css-colorization 1)
+		;; (setq web-mode-enable-current-element-highlight 1)
+		(setq web-mode-enable-auto-closing 1)
 
-	;; Auto-complete
-	(setq web-mode-ac-sources-alist
-	'(("css" . (ac-source-css-property))
-	  ("html" . (ac-source-words-in-buffer ac-source-abbrev)))))
+		;; Auto-complete
+		;; Disable the default flycheck jslint:
+		;; (setq-default flycheck-disabled-checkers
+		;;   (append flycheck-disabled-checkers
+		;;     '(javascript-jshint json-jsonlist)))
 
-      (use-package emmet-mode
-	;; :defer t ;; Makes it not work
-	;; useless automatically works
-	;; :bind (("<C-return>" . hamza/emmet-tab)
-	;;        ("C-j" . emmet-expand-line))
-	:config
-	(add-hook 'web-mode-hook 'emmet-mode))
+		(setq web-mode-ac-sources-alist
+		  '(("css" . (ac-source-css-property))
+			("html" . (ac-source-words-in-buffer ac-source-abbrev))))
 
-      (use-package js2-mode
-	:defer t)
+		;; Enable prettier-js-mode for files in a project with prettier (this will use the projects .prettierrc)
+		(add-node-modules-path)
+		(prettier-js-mode)
+		(rjsx-mode))
+
+	  (use-package emmet-mode
+		;; :defer t ;; Makes it not work
+		;; useless automatically works
+		;; :bind (("<C-return>" . hamza/emmet-tab)
+		;;        ("C-j" . emmet-expand-line))
+		:hook web-mode)
+
+	  ;; (add-hook 'js2-mode-hook 'skewer-mode)
+	  ;; (add-hook 'css-mode-hook 'skewer-css-mode)
+	  ;; (add-hook 'html-mode-hook 'skewer-html-mode)
+
+	  (use-package skewer-mode
+		:hook ((js2-mode . skewer-mode)
+			   (css-mode . skewer-css-mode)
+			   (html-mode . skewer-html-mode)))
+
+	  (use-package impatient-mode
+		:hook web-mode)
+
+	  ;; (use-package flycheck-mode
+	  ;;   :hook web-mode
+	  ;;   :config
+	  ;;   ;; Enable eslint checker for web-mode
+	  ;;   (flycheck-add-mode 'javascript-eslint 'web-mode))
+
+	  ;; (use-package add-node-modules-path
+	  ;;   :hook flycheck-mode)
+
+	  ;; (use-package js2-mode
+	  ;;   :hook web-mode)
+
+	  (use-package rjsx-mode
+		:mode (("\\.jsx?$" . rjsx-mode))
+		:config
+		(setf tab-width 4
+			  js-indent-level 2))
+
+	  (use-package prettier-js
+		:hook (rjsx-mode . prettier-js-mode))
     #+end_src
 *** C Auto Complete & Flymake
         #+begin_src emacs-lisp
@@ -2010,11 +2105,23 @@
 	;;     (indent-according-to-mode)))
 
 	(defun hamza/reload-config ()
-      (interactive)
+	  (interactive)
 	  (setq my-org-config-file (concat user-emacs-directory "init.org"))
 	  (setq my-config-file (concat user-emacs-directory "org-init.el"))
 	  (org-babel-tangle-file my-org-config-file)
 	  (load-file my-config-file))
+
+	(defun hamza/clear-the-clutter ()
+	  (interactive)
+	  ;; (message "%s"
+	  ;;   (mapcar 'buffer-name
+	  ;;     (buffer-list)))
+	  (mapc (lambda (buffer)
+			  (let ((buf-name (buffer-name buffer)))
+				(unless (or (string= buf-name "*scratch*")
+							(string= buf-name "*Messages*"))
+				  (kill-buffer buffer))))
+			(buffer-list)))
   #+end_src
 
 * Keybindings
@@ -2074,10 +2181,11 @@
 	   "feip" '((lambda () (interactive)(find-file "~/edu/o-lvls/isl/pp/")) :which-key "Past Papers")
 	   ;; Config Files
 	   "fc" '(:ignore t :which-key "Configuration Files")
-	   "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.el")) :which-key "Emacs config")
+	   "fce" '((lambda () (interactive)(find-file "~/.emacs.d/init.org")) :which-key "Emacs config")
 	   "fcw" '(:ignore t :which-key "WM Config Files")
 	   "fcwa" '((lambda () (interactive)(find-file "~/.config/awesome/rc.lua")) :which-key "AwesomeWM Config")
 	   "fcwx" '((lambda () (interactive)(find-file "~/.xmonad/xmonad.hs")) :which-key "XMonad Config")
+	   "fcws" '((lambda () (interactive)(find-file "~/.stumpwm.d/init.lisp")) :which-key "StumpWM Config")
 
 	   ;;; Code
 	   "c" '(:ignore t :which-key "Code")
